@@ -267,6 +267,8 @@ class _PlayerState extends State<Player> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextField(
+                      showCursor: true,
+                      autofocus: true,
                       onChanged: widget.nameFunction,
                       decoration: InputDecoration(hintText: widget.hint),
                       style:
