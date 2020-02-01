@@ -30,6 +30,9 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   bool volumeOn = true;
 
+  double playerOneOpacity = 1.0;
+  double playerTwoOpacity = 0.5;
+
   @override
   initState() {
     super.initState();
@@ -157,6 +160,7 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
             score: playerOneScore.toString(),
             color: Colors.red,
             hint: ('Player 1'),
+            opacity: playerOneOpacity,
           ),
         ),
         Stack(
@@ -169,11 +173,13 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
                 color: Colors.green,
                 splashColor: Colors.greenAccent,
                 onPressed: () {
+                  adjustPlayerOpacity();
                   if (volumeOn) {
                     _speak(
                         playerOneScore: playerOneScore,
                         playerTwoScore: playerTwoScore);
                   }
+                  setState(() {});
                 },
               ),
             ),
@@ -199,10 +205,21 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
             score: playerTwoScore.toString(),
             color: Colors.blue,
             hint: ('Player 2'),
+            opacity: playerTwoOpacity,
           ),
         ),
       ]),
     );
+  }
+
+  void adjustPlayerOpacity() {
+    if (playerOneOpacity == 0.5) {
+      playerOneOpacity = 1.0;
+      playerTwoOpacity = 0.5;
+    } else if (playerTwoOpacity == 0.5) {
+      playerTwoOpacity = 1.0;
+      playerOneOpacity = 0.5;
+    }
   }
 
   void changeVolume() {
@@ -256,6 +273,7 @@ class Player extends StatefulWidget {
     @required this.score,
     @required this.color,
     @required this.hint,
+    @required this.opacity,
   });
 
   final Function scoreDragFunction;
@@ -263,6 +281,7 @@ class Player extends StatefulWidget {
   final String score;
   final Color color;
   final String hint;
+  final double opacity;
 
   @override
   _PlayerState createState() => _PlayerState();
@@ -271,41 +290,51 @@ class Player extends StatefulWidget {
 class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onVerticalDragEnd: (details) {
-          widget.scoreDragFunction(details);
-        },
-        child: Container(
-          color: widget.color,
-          child: Column(
-            children: <Widget>[
-              Container(
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: TextField(
-                      showCursor: true,
-                      autofocus: true,
-                      onChanged: widget.nameFunction,
-                      decoration: InputDecoration(hintText: widget.hint),
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+    final enabled = widget.opacity == 1.0;
+    return Opacity(
+      opacity: widget.opacity,
+      child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            if (enabled) widget.scoreDragFunction(details);
+          },
+          child: Container(
+            color: widget.color,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  child: Container(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        enabled: enabled,
+                        showCursor: true,
+                        autofocus: true,
+                        onChanged: widget.nameFunction,
+                        decoration: InputDecoration(hintText: widget.hint),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Text(
-                    widget.score,
-                    style: TextStyle(fontSize: 120),
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: Text(
+                      widget.score,
+                      style: TextStyle(
+                        color: Colors.grey[200],
+                        fontSize: 240,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ));
+              ],
+            ),
+          )),
+    );
   }
 }
