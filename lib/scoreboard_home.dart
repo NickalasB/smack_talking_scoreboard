@@ -28,6 +28,8 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   get isStopped => ttsState == TtsState.STOPPED;
 
+  bool volumeOn = true;
+
   @override
   initState() {
     super.initState();
@@ -61,6 +63,7 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   Future _speak({int playerOneScore, int playerTwoScore}) async {
     await flutterTts.setVolume(volume);
+    print('Volume = $volume');
 
     String playerToInsult = '';
     List<String> insultList = [];
@@ -156,19 +159,38 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
             hint: ('Player 1'),
           ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: IconButton(
-            icon: Icon(Icons.check_circle),
-            iconSize: 64,
-            color: Colors.green,
-            splashColor: Colors.greenAccent,
-            onPressed: () {
-              _speak(
-                  playerOneScore: playerOneScore,
-                  playerTwoScore: playerTwoScore);
-            },
-          ),
+        Stack(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              child: IconButton(
+                icon: Icon(Icons.check_circle),
+                iconSize: 64,
+                color: Colors.green,
+                splashColor: Colors.greenAccent,
+                onPressed: () {
+                  if (volumeOn) {
+                    _speak(
+                        playerOneScore: playerOneScore,
+                        playerTwoScore: playerTwoScore);
+                  }
+                },
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: IconButton(
+                icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
+                iconSize: 64,
+                color: Colors.grey,
+                splashColor: Colors.greenAccent,
+                onPressed: () {
+                  changeVolume();
+                  setState(() {});
+                },
+              ),
+            )
+          ],
         ),
         Expanded(
           child: Player(
@@ -181,6 +203,17 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
         ),
       ]),
     );
+  }
+
+  void changeVolume() {
+    if (volumeOn) {
+      volume = 0.0;
+      volumeOn = false;
+      _stop();
+    } else {
+      volume = 0.5;
+      volumeOn = true;
+    }
   }
 
   void adjustPlayerOneScore(DragEndDetails details) {
