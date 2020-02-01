@@ -156,8 +156,9 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
         Expanded(
           child: Player(
             scoreDragFunction: adjustPlayerOneScore,
+            longPressFunction: resetScores,
             nameFunction: _onChangePlayerOne,
-            score: playerOneScore.toString(),
+            score: playerOneScore,
             color: Colors.red,
             hint: ('Player 1'),
             opacity: playerOneOpacity,
@@ -201,8 +202,9 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
         Expanded(
           child: Player(
             scoreDragFunction: adjustPlayerTwoScore,
+            longPressFunction: resetScores,
             nameFunction: _onChangePlayerTwo,
-            score: playerTwoScore.toString(),
+            score: playerTwoScore,
             color: Colors.blue,
             hint: ('Player 2'),
             opacity: playerTwoOpacity,
@@ -264,11 +266,19 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
       }
     });
   }
+
+  void resetScores() {
+    setState(() {
+      playerTwoScore = 0;
+      playerOneScore = 0;
+    });
+  }
 }
 
 class Player extends StatefulWidget {
   const Player({
     @required this.scoreDragFunction,
+    @required this.longPressFunction,
     @required this.nameFunction,
     @required this.score,
     @required this.color,
@@ -277,8 +287,9 @@ class Player extends StatefulWidget {
   });
 
   final Function scoreDragFunction;
+  final Function longPressFunction;
   final Function nameFunction;
-  final String score;
+  final int score;
   final Color color;
   final String hint;
   final double opacity;
@@ -297,6 +308,7 @@ class _PlayerState extends State<Player> {
           onVerticalDragEnd: (details) {
             if (enabled) widget.scoreDragFunction(details);
           },
+          onLongPress: widget.longPressFunction,
           child: Container(
             color: widget.color,
             child: Column(
@@ -324,7 +336,7 @@ class _PlayerState extends State<Player> {
                   flex: 2,
                   child: Center(
                     child: Text(
-                      widget.score,
+                      widget.score.toString(),
                       style: TextStyle(
                         color: Colors.grey[200],
                         fontSize: 240,
