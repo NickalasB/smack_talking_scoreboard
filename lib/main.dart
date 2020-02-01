@@ -1,111 +1,293 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  _MyAppState createState() => _MyAppState();
+}
+
+enum TtsState { PLAYING, STOPPED }
+
+class _MyAppState extends State<MyApp> {
+  FlutterTts flutterTts;
+  dynamic languages;
+  double volume = 0.5;
+
+  String _playerOne;
+
+  String _playerTwo;
+
+  int playerOneScore = 0;
+
+  int playerTwoScore = 0;
+
+  TtsState ttsState = TtsState.STOPPED;
+
+  get isPlaying => ttsState == TtsState.PLAYING;
+
+  get isStopped => ttsState == TtsState.STOPPED;
+
+  @override
+  initState() {
+    super.initState();
+    initTts();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  initTts() {
+    flutterTts = FlutterTts();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+    flutterTts.setStartHandler(() {
+      setState(() {
+        print("playing");
+        ttsState = TtsState.PLAYING;
+      });
+    });
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        print("Complete");
+        ttsState = TtsState.STOPPED;
+      });
+    });
 
-  final String title;
+    flutterTts.setErrorHandler((msg) {
+      setState(() {
+        print("error: $msg");
+        ttsState = TtsState.STOPPED;
+      });
+    });
+  }
+
+  Future _speak({int playerOneScore, int playerTwoScore}) async {
+    await flutterTts.setVolume(volume);
+
+    String playerToInsult = '';
+    List<String> insultList = [];
+    if (playerOneScore < playerTwoScore) {
+      if (_playerOne != '' && _playerOne != null) {
+        playerToInsult = _playerOne;
+      } else {
+        playerToInsult = ('Player 1');
+      }
+      insultList = standardInsults(playerToInsult);
+    } else if (playerOneScore > playerTwoScore) {
+      if (_playerTwo != '' && _playerTwo != null) {
+        playerToInsult = _playerTwo;
+      } else {
+        playerToInsult = ('Player 2');
+      }
+      insultList = standardInsults(playerToInsult);
+    } else if (playerOneScore == playerTwoScore) {
+      insultList = tieGameInsults();
+    }
+    if (ttsState != TtsState.PLAYING) {
+      var result = await flutterTts.speak(insultList.first);
+      if (result == 1) setState(() => ttsState = TtsState.PLAYING);
+    }
+  }
+
+  List<String> standardInsults(String playerToInsult) {
+    List<String> insultList = [
+      'News flash. $playerToInsult You suck',
+      '$playerToInsult, you should quit your dayjob and dedicate your life to being less terrible',
+      'Bad job $playerToInsult',
+      'That was the saddest thing I have ever seen $playerToInsult',
+      'Are you embarrassed $playerToInsult? You should be',
+      'This game isn\'t for everyone. Cough, cough $playerToInsult',
+      '$playerToInsult, congratulations on your nomination into the hall of losers',
+      'Everyone in this room is now dumber after watching $playerToInsult',
+      'We should rename this game to: $playerToInsult sucks at life',
+      'Those who can. Do. Those who can\'t. Are named $playerToInsult',
+      'Things to add to your bucket list $playerToInsult. Doing much much better at this game.',
+      '$playerToInsult.How bad you are doing at this game is a crime in some countries',
+      'Words escape me $playerToInsult. Oh wait. No they don\'t. You are garbage.',
+      'It is physically painful to watch you play this game $playerToInsult',
+      '$playerToInsult this reminds me of the time you invested your life savings into laserdisc stock'
+    ];
+    insultList.shuffle();
+    return insultList;
+  }
+
+  List<String> tieGameInsults() {
+    List<String> insultList = [
+      'Oh wow- a tie! Cuz that\'s fun?',
+      'At least you two won\'t be lonely in sucks-ville',
+      'You are both very not good at this',
+    ];
+    insultList.shuffle();
+    return insultList;
+  }
+
+  Future _stop() async {
+    var result = await flutterTts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.STOPPED);
+  }
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  void dispose() {
+    super.dispose();
+    flutterTts.stop();
+  }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  void _onChangePlayerOne(String text) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _playerOne = text;
+    });
+  }
+
+  void _onChangePlayerTwo(String text) {
+    setState(() {
+      _playerTwo = text;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Colors.blueGrey,
+          resizeToAvoidBottomInset: false,
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(children: [
+              Expanded(
+                child: Player(
+                  scoreDragFunction: adjustPlayerOneScore,
+                  nameFunction: _onChangePlayerOne,
+                  score: playerOneScore.toString(),
+                  color: Colors.red,
+                  hint: ('Player 1'),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: IconButton(
+                  icon: Icon(Icons.check_circle),
+                  iconSize: 64,
+                  color: Colors.green,
+                  splashColor: Colors.greenAccent,
+                  onPressed: () {
+                    _speak(
+                        playerOneScore: playerOneScore,
+                        playerTwoScore: playerTwoScore);
+                  },
+                ),
+              ),
+              Expanded(
+                child: Player(
+                  scoreDragFunction: adjustPlayerTwoScore,
+                  nameFunction: _onChangePlayerTwo,
+                  score: playerTwoScore.toString(),
+                  color: Colors.blue,
+                  hint: ('Player 2'),
+                ),
+              ),
+            ]),
+          ),
+        ));
+  }
+
+  void adjustPlayerOneScore(DragEndDetails details) {
+    setState(() {
+      if (details.primaryVelocity != 0) {
+        //drag up
+        if (details.primaryVelocity < 0) {
+          playerOneScore++;
+        } else {
+          //drag down
+          if (playerOneScore > 0) {
+            playerOneScore--;
+          }
+        }
+      }
+    });
+  }
+
+  void adjustPlayerTwoScore(DragEndDetails details) {
+    setState(() {
+      if (details.primaryVelocity != 0) {
+        //drag up
+        if (details.primaryVelocity < 0) {
+          playerTwoScore++;
+        } else {
+          //drag down
+          if (playerTwoScore > 0) {
+            playerTwoScore--;
+          }
+        }
+      }
+    });
+  }
+}
+
+class Player extends StatefulWidget {
+  const Player({
+    @required this.scoreDragFunction,
+    @required this.nameFunction,
+    @required this.score,
+    @required this.color,
+    @required this.hint,
+  });
+
+  final Function scoreDragFunction;
+  final Function nameFunction;
+  final String score;
+  final Color color;
+  final String hint;
+
+  @override
+  _PlayerState createState() => _PlayerState();
+}
+
+class _PlayerState extends State<Player> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onVerticalDragEnd: (details) {
+          widget.scoreDragFunction(details);
+        },
+        child: Container(
+          color: widget.color,
+          child: Column(
+            children: <Widget>[
+              Container(
+                child: Container(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextField(
+                      showCursor: true,
+                      autofocus: true,
+                      onChanged: widget.nameFunction,
+                      decoration: InputDecoration(hintText: widget.hint),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Text(
+                    widget.score,
+                    style: TextStyle(fontSize: 120),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
