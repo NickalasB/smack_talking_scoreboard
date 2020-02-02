@@ -157,6 +157,11 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
           child: Player(
             scoreDragFunction: adjustPlayerOneScore,
             longPressFunction: resetScores,
+            singleTapFunction: () {
+              setState(() {
+                playerOneScore++;
+              });
+            },
             nameFunction: _onChangePlayerOne,
             score: playerOneScore,
             color: Colors.red,
@@ -203,6 +208,11 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
           child: Player(
             scoreDragFunction: adjustPlayerTwoScore,
             longPressFunction: resetScores,
+            singleTapFunction: () {
+              setState(() {
+                playerTwoScore++;
+              });
+            },
             nameFunction: _onChangePlayerTwo,
             score: playerTwoScore,
             color: Colors.blue,
@@ -279,6 +289,7 @@ class Player extends StatefulWidget {
   const Player({
     @required this.scoreDragFunction,
     @required this.longPressFunction,
+    @required this.singleTapFunction,
     @required this.nameFunction,
     @required this.score,
     @required this.color,
@@ -288,6 +299,7 @@ class Player extends StatefulWidget {
 
   final Function scoreDragFunction;
   final Function longPressFunction;
+  final Function singleTapFunction;
   final Function nameFunction;
   final int score;
   final Color color;
@@ -309,6 +321,7 @@ class _PlayerState extends State<Player> {
             if (enabled) widget.scoreDragFunction(details);
           },
           onLongPress: widget.longPressFunction,
+          onTap: widget.singleTapFunction,
           child: Container(
             color: widget.color,
             child: Column(
@@ -339,7 +352,7 @@ class _PlayerState extends State<Player> {
                       widget.score.toString(),
                       style: TextStyle(
                         color: Colors.grey[200],
-                        fontSize: 240,
+                        fontSize: 220,
                       ),
                     ),
                   ),
