@@ -30,6 +30,9 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   bool volumeOn = true;
 
+  double playerOneOpacity = 1.0;
+  double playerTwoOpacity = 0.5;
+
   @override
   initState() {
     super.initState();
@@ -153,10 +156,16 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
         Expanded(
           child: Player(
             scoreDragFunction: adjustPlayerOneScore,
+            longPressFunction: resetScores,
+            singleTapFunction: () {
+              playerOneScore++;
+              setState(() {});
+            },
             nameFunction: _onChangePlayerOne,
-            score: playerOneScore.toString(),
+            score: playerOneScore,
             color: Colors.red,
             hint: ('Player 1'),
+            opacity: playerOneOpacity,
           ),
         ),
         Stack(
@@ -169,11 +178,13 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
                 color: Colors.green,
                 splashColor: Colors.greenAccent,
                 onPressed: () {
+                  adjustPlayerOpacity();
                   if (volumeOn) {
                     _speak(
                         playerOneScore: playerOneScore,
                         playerTwoScore: playerTwoScore);
                   }
+                  setState(() {});
                 },
               ),
             ),
@@ -195,14 +206,30 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
         Expanded(
           child: Player(
             scoreDragFunction: adjustPlayerTwoScore,
+            longPressFunction: resetScores,
+            singleTapFunction: () {
+              playerTwoScore++;
+              setState(() {});
+            },
             nameFunction: _onChangePlayerTwo,
-            score: playerTwoScore.toString(),
+            score: playerTwoScore,
             color: Colors.blue,
             hint: ('Player 2'),
+            opacity: playerTwoOpacity,
           ),
         ),
       ]),
     );
+  }
+
+  void adjustPlayerOpacity() {
+    if (playerOneOpacity == 0.5) {
+      playerOneOpacity = 1.0;
+      playerTwoOpacity = 0.5;
+    } else if (playerTwoOpacity == 0.5) {
+      playerTwoOpacity = 1.0;
+      playerOneOpacity = 0.5;
+    }
   }
 
   void changeVolume() {
@@ -247,22 +274,35 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
       }
     });
   }
+
+  void resetScores() {
+    setState(() {
+      playerTwoScore = 0;
+      playerOneScore = 0;
+    });
+  }
 }
 
 class Player extends StatefulWidget {
   const Player({
     @required this.scoreDragFunction,
+    @required this.longPressFunction,
+    @required this.singleTapFunction,
     @required this.nameFunction,
     @required this.score,
     @required this.color,
     @required this.hint,
+    @required this.opacity,
   });
 
   final Function scoreDragFunction;
+  final Function longPressFunction;
+  final Function singleTapFunction;
   final Function nameFunction;
-  final String score;
+  final int score;
   final Color color;
   final String hint;
+  final double opacity;
 
   @override
   _PlayerState createState() => _PlayerState();
@@ -271,41 +311,53 @@ class Player extends StatefulWidget {
 class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onVerticalDragEnd: (details) {
-          widget.scoreDragFunction(details);
-        },
-        child: Container(
-          color: widget.color,
-          child: Column(
-            children: <Widget>[
-              Container(
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: TextField(
-                      showCursor: true,
-                      autofocus: true,
-                      onChanged: widget.nameFunction,
-                      decoration: InputDecoration(hintText: widget.hint),
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+    final enabled = widget.opacity == 1.0;
+    return Opacity(
+      opacity: widget.opacity,
+      child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            if (enabled) widget.scoreDragFunction(details);
+          },
+          onLongPress: widget.longPressFunction,
+          onTap: enabled ? widget.singleTapFunction : null,
+          child: Container(
+            color: widget.color,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  child: Container(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        enabled: enabled,
+                        showCursor: true,
+                        autofocus: true,
+                        onChanged: widget.nameFunction,
+                        decoration: InputDecoration(hintText: widget.hint),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Text(
-                    widget.score,
-                    style: TextStyle(fontSize: 120),
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: Text(
+                      widget.score.toString(),
+                      style: TextStyle(
+                        color: Colors.grey[200],
+                        fontSize: 220,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ));
+              ],
+            ),
+          )),
+    );
   }
 }

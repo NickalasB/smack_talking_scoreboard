@@ -13,6 +13,7 @@ class SmackTalkingScoreboard extends StatelessWidget {
     ]);
     SystemChrome.setEnabledSystemUIOverlays([]);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey[300],
         resizeToAvoidBottomInset: false,
