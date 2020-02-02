@@ -158,9 +158,8 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
             scoreDragFunction: adjustPlayerOneScore,
             longPressFunction: resetScores,
             singleTapFunction: () {
-              setState(() {
-                playerOneScore++;
-              });
+              playerOneScore++;
+              setState(() {});
             },
             nameFunction: _onChangePlayerOne,
             score: playerOneScore,
@@ -209,9 +208,8 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
             scoreDragFunction: adjustPlayerTwoScore,
             longPressFunction: resetScores,
             singleTapFunction: () {
-              setState(() {
-                playerTwoScore++;
-              });
+              playerTwoScore++;
+              setState(() {});
             },
             nameFunction: _onChangePlayerTwo,
             score: playerTwoScore,
@@ -321,7 +319,7 @@ class _PlayerState extends State<Player> {
             if (enabled) widget.scoreDragFunction(details);
           },
           onLongPress: widget.longPressFunction,
-          onTap: widget.singleTapFunction,
+          onTap: enabled ? widget.singleTapFunction : null,
           child: Container(
             color: widget.color,
             child: Column(
