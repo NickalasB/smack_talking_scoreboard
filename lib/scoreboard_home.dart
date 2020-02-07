@@ -312,39 +312,37 @@ class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
     final enabled = widget.opacity == 1.0;
-    return Opacity(
-      opacity: widget.opacity,
-      child: GestureDetector(
-          onVerticalDragEnd: (details) {
-            if (enabled) widget.scoreDragFunction(details);
-          },
-          onLongPress: widget.longPressFunction,
-          onTap: enabled ? widget.singleTapFunction : null,
-          child: Container(
-            color: widget.color,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: Container(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextField(
-                        enabled: enabled,
-                        showCursor: true,
-                        autofocus: true,
-                        onChanged: widget.nameFunction,
-                        decoration: InputDecoration(hintText: widget.hint),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 24),
+        Container(
+          alignment: Alignment.topCenter,
+          color: widget.color,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextField(
+              showCursor: true,
+              textCapitalization: TextCapitalization.words,
+              onChanged: widget.nameFunction,
+              decoration: InputDecoration(hintText: widget.hint),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Opacity(
+            opacity: widget.opacity,
+            child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  if (enabled) widget.scoreDragFunction(details);
+                },
+                onLongPress: widget.longPressFunction,
+                onTap: enabled ? widget.singleTapFunction : null,
+                child: Container(
+                  color: widget.color,
                   child: Center(
                     child: Text(
                       widget.score.toString(),
@@ -354,10 +352,10 @@ class _PlayerState extends State<Player> {
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )),
+                )),
+          ),
+        ),
+      ],
     );
   }
 }
