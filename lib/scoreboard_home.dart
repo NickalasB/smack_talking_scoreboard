@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:smack_talking_scoreboard/strings.dart';
 
 class ScoreboardHome extends StatefulWidget {
   @override
@@ -91,38 +92,6 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
       var result = await flutterTts.speak(insultList.first);
       if (result == 1) setState(() => ttsState = TtsState.PLAYING);
     }
-  }
-
-  List<String> standardInsults(String playerToInsult) {
-    List<String> insultList = [
-      'News flash. $playerToInsult You suck',
-      '$playerToInsult, you should quit your dayjob and dedicate your life to being less terrible',
-      'Bad job $playerToInsult',
-      'That was the saddest thing I have ever seen $playerToInsult',
-      'Are you embarrassed $playerToInsult? You should be',
-      'This game isn\'t for everyone. Cough, cough $playerToInsult',
-      '$playerToInsult, congratulations on your nomination into the hall of losers',
-      'Everyone in this room is now dumber after watching $playerToInsult',
-      'We should rename this game to: $playerToInsult sucks at life',
-      'Those who can. Do. Those who can\'t. Are named $playerToInsult',
-      'Things to add to your bucket list $playerToInsult. Doing much much better at this game.',
-      '$playerToInsult.How bad you are doing at this game is a crime in some countries',
-      'Words escape me $playerToInsult. Oh wait. No they don\'t. You are garbage.',
-      'It is physically painful to watch you play this game $playerToInsult',
-      '$playerToInsult this reminds me of the time you invested your life savings into laserdisc stock'
-    ];
-    insultList.shuffle();
-    return insultList;
-  }
-
-  List<String> tieGameInsults() {
-    List<String> insultList = [
-      'Oh wow- a tie! Cuz that\'s fun?',
-      'At least you two won\'t be lonely in sucks-ville',
-      'You are both very not good at this',
-    ];
-    insultList.shuffle();
-    return insultList;
   }
 
   Future _stop() async {
