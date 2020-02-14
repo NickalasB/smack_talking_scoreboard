@@ -1,3 +1,10 @@
+const String mainMenuTitle = 'SMACK TALKING SCOREBOARD';
+const String singleGameLabel = 'Single Game';
+const String tournamentLabel = 'Tournament';
+
+const String player1 = 'Player 1';
+const String player2 = 'Player 2';
+
 List<String> standardInsults(String playerToInsult) {
   List<String> insultList = [
     '$playerToInsult. Are your eyes even open while you\'re playing?',
