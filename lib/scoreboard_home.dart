@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:smack_talking_scoreboard/strings.dart';
+import 'package:smack_talking_scoreboard/strings.dart' as strings;
 
 class ScoreboardHome extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -83,18 +83,18 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
       if (_playerOne != '' && _playerOne != null) {
         playerToInsult = _playerOne;
       } else {
-        playerToInsult = ('Player 1');
+        playerToInsult = (strings.player1);
       }
-      insultList = standardInsults(playerToInsult);
+      insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore > playerTwoScore) {
       if (_playerTwo != '' && _playerTwo != null) {
         playerToInsult = _playerTwo;
       } else {
-        playerToInsult = ('Player 2');
+        playerToInsult = (strings.player2);
       }
-      insultList = standardInsults(playerToInsult);
+      insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore == playerTwoScore) {
-      insultList = tieGameInsults();
+      insultList = strings.tieGameInsults();
     }
     if (ttsState != TtsState.PLAYING) {
       var result = await flutterTts.speak(insultList.first);
@@ -146,7 +146,7 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
               nameFunction: _onChangePlayerOne,
               score: playerOneScore,
               color: Colors.red,
-              hint: ('Player 1'),
+              hint: (strings.player1),
               opacity: playerOneOpacity,
             ),
           ),
@@ -197,7 +197,7 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
               nameFunction: _onChangePlayerTwo,
               score: playerTwoScore,
               color: Colors.blue,
-              hint: ('Player 2'),
+              hint: (strings.player2),
               opacity: playerTwoOpacity,
             ),
           ),
