@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:smack_talking_scoreboard/strings.dart';
 
 class ScoreboardHome extends StatefulWidget {
+  static const String id = 'scoreboard';
+
   @override
   _ScoreboardHomeState createState() => _ScoreboardHomeState();
 }
@@ -37,6 +40,11 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
   @override
   initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
     initTts();
   }
 
@@ -103,6 +111,10 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
   void dispose() {
     super.dispose();
     flutterTts.stop();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
   }
 
   void _onChangePlayerOne(String text) {
@@ -119,75 +131,78 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(children: [
-        Expanded(
-          child: Player(
-            scoreDragFunction: adjustPlayerOneScore,
-            longPressFunction: resetScores,
-            singleTapFunction: () {
-              playerOneScore++;
-              setState(() {});
-            },
-            nameFunction: _onChangePlayerOne,
-            score: playerOneScore,
-            color: Colors.red,
-            hint: ('Player 1'),
-            opacity: playerOneOpacity,
-          ),
-        ),
-        Stack(
-          children: <Widget>[
-            Align(
-              alignment: Alignment.center,
-              child: IconButton(
-                icon: Icon(Icons.check_circle),
-                iconSize: 64,
-                color: Colors.green,
-                splashColor: Colors.greenAccent,
-                onPressed: () {
-                  adjustPlayerOpacity();
-                  if (volumeOn) {
-                    _speak(
-                        playerOneScore: playerOneScore,
-                        playerTwoScore: playerTwoScore);
-                  }
-                  setState(() {});
-                },
-              ),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(children: [
+          Expanded(
+            child: Player(
+              scoreDragFunction: adjustPlayerOneScore,
+              longPressFunction: resetScores,
+              singleTapFunction: () {
+                playerOneScore++;
+                setState(() {});
+              },
+              nameFunction: _onChangePlayerOne,
+              score: playerOneScore,
+              color: Colors.red,
+              hint: ('Player 1'),
+              opacity: playerOneOpacity,
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: IconButton(
-                icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
-                iconSize: 64,
-                color: Colors.grey,
-                splashColor: Colors.greenAccent,
-                onPressed: () {
-                  changeVolume();
-                  setState(() {});
-                },
-              ),
-            )
-          ],
-        ),
-        Expanded(
-          child: Player(
-            scoreDragFunction: adjustPlayerTwoScore,
-            longPressFunction: resetScores,
-            singleTapFunction: () {
-              playerTwoScore++;
-              setState(() {});
-            },
-            nameFunction: _onChangePlayerTwo,
-            score: playerTwoScore,
-            color: Colors.blue,
-            hint: ('Player 2'),
-            opacity: playerTwoOpacity,
           ),
-        ),
-      ]),
+          Stack(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.center,
+                child: IconButton(
+                  icon: Icon(Icons.check_circle),
+                  iconSize: 64,
+                  color: Colors.green,
+                  splashColor: Colors.greenAccent,
+                  onPressed: () {
+                    adjustPlayerOpacity();
+                    if (volumeOn) {
+                      _speak(
+                          playerOneScore: playerOneScore,
+                          playerTwoScore: playerTwoScore);
+                    }
+                    setState(() {});
+                  },
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: IconButton(
+                  icon:
+                      volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
+                  iconSize: 64,
+                  color: Colors.grey,
+                  splashColor: Colors.greenAccent,
+                  onPressed: () {
+                    changeVolume();
+                    setState(() {});
+                  },
+                ),
+              )
+            ],
+          ),
+          Expanded(
+            child: Player(
+              scoreDragFunction: adjustPlayerTwoScore,
+              longPressFunction: resetScores,
+              singleTapFunction: () {
+                playerTwoScore++;
+                setState(() {});
+              },
+              nameFunction: _onChangePlayerTwo,
+              score: playerTwoScore,
+              color: Colors.blue,
+              hint: ('Player 2'),
+              opacity: playerTwoOpacity,
+            ),
+          ),
+        ]),
+      ),
     );
   }
 

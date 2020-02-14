@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:smack_talking_scoreboard/scoreboard_home.dart';
+
+import 'main_menu.dart';
 
 void main() => runApp(SmackTalkingScoreboard());
 
 class SmackTalkingScoreboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
     return MaterialApp(
+      initialRoute: MainMenuScreen.id,
+      routes: {
+        MainMenuScreen.id: (context) => MainMenuScreen(),
+        ScoreboardHome.id: (context) => ScoreboardHome(),
+      },
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.grey[300],
-        resizeToAvoidBottomInset: false,
-        body: ScoreboardHome(),
-      ),
     );
   }
 }
