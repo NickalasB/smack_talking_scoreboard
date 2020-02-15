@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smack_talking_scoreboard/scoreboard_home.dart';
+import 'package:smack_talking_scoreboard/scoreboard.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 
 class MainMenuScreen extends StatefulWidget {
   static const String id = 'main_menu';
+
+  const MainMenuScreen();
 
   @override
   _MainMenuScreenState createState() => _MainMenuScreenState();
@@ -73,7 +75,7 @@ class GameButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(16),
       child: RaisedButton(
-        onPressed: () => Navigator.pushNamed(context, ScoreboardHome.id),
+        onPressed: () => Navigator.pushNamed(context, Scoreboard.id),
         elevation: 4,
         child: Text(
           label,

@@ -4,6 +4,7 @@ const String tournamentLabel = 'Tournament';
 
 const String player1 = 'Player 1';
 const String player2 = 'Player 2';
+const String forTheWin = 'FTW';
 
 List<String> standardInsults(String playerToInsult) {
   List<String> insultList = [

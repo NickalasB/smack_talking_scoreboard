@@ -4,23 +4,27 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 
-class ScoreboardHome extends StatefulWidget {
+class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
 
+  const Scoreboard();
+
   @override
-  _ScoreboardHomeState createState() => _ScoreboardHomeState();
+  _ScoreboardState createState() => _ScoreboardState();
 }
 
 enum TtsState { PLAYING, STOPPED }
 
-class _ScoreboardHomeState extends State<ScoreboardHome> {
+class _ScoreboardState extends State<Scoreboard> {
   FlutterTts flutterTts;
   dynamic languages;
   double volume = 0.5;
 
-  String _playerOne;
+  String playerOneName = strings.player1;
 
-  String _playerTwo;
+  String playerTwoName = strings.player2;
+
+  int scoreToWin = 0;
 
   int playerOneScore = 0;
 
@@ -35,7 +39,8 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
   bool volumeOn = true;
 
   double playerOneOpacity = 1.0;
-  double playerTwoOpacity = 0.5;
+
+  double playerTwoOpacity = 1.0;
 
   @override
   initState() {
@@ -80,18 +85,10 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
     String playerToInsult = '';
     List<String> insultList = [];
     if (playerOneScore < playerTwoScore) {
-      if (_playerOne != '' && _playerOne != null) {
-        playerToInsult = _playerOne;
-      } else {
-        playerToInsult = (strings.player1);
-      }
+      playerToInsult = playerOneName;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore > playerTwoScore) {
-      if (_playerTwo != '' && _playerTwo != null) {
-        playerToInsult = _playerTwo;
-      } else {
-        playerToInsult = (strings.player2);
-      }
+      playerToInsult = playerTwoName;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore == playerTwoScore) {
       insultList = strings.tieGameInsults();
@@ -119,18 +116,26 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
 
   void _onChangePlayerOne(String text) {
     setState(() {
-      _playerOne = text;
+      playerOneName = text.isNotEmpty ? text : strings.player1;
     });
   }
 
   void _onChangePlayerTwo(String text) {
     setState(() {
-      _playerTwo = text;
+      playerTwoName = text.isNotEmpty ? text : strings.player2;
+    });
+  }
+
+  void updateScoreToWin(String text) {
+    setState(() {
+      scoreToWin = int.parse(text);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final playerOneWins = playerOneScore > 0 && playerOneScore == scoreToWin;
+    final playerTwoWins = playerTwoScore > 0 && playerTwoScore == scoreToWin;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -150,40 +155,69 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
               opacity: playerOneOpacity,
             ),
           ),
-          Stack(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: IconButton(
-                  icon: Icon(Icons.check_circle),
-                  iconSize: 64,
-                  color: Colors.green,
-                  splashColor: Colors.greenAccent,
-                  onPressed: () {
-                    adjustPlayerOpacity();
-                    if (volumeOn) {
-                      _speak(
-                          playerOneScore: playerOneScore,
-                          playerTwoScore: playerTwoScore);
-                    }
-                    setState(() {});
-                  },
-                ),
+              Column(
+                children: <Widget>[
+                  SizedBox(height: 4),
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: new BoxDecoration(
+                      color: Colors.yellow[500],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: TextField(
+                        showCursor: true,
+                        onChanged: updateScoreToWin,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration.collapsed(
+                            hintText: strings.forTheWin),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: IconButton(
-                  icon:
-                      volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
-                  iconSize: 64,
-                  color: Colors.grey,
-                  splashColor: Colors.greenAccent,
-                  onPressed: () {
-                    changeVolume();
-                    setState(() {});
-                  },
-                ),
-              )
+              IconButton(
+                icon: Icon(Icons.check_circle),
+                iconSize: 64,
+                color: Colors.green,
+                splashColor: Colors.greenAccent,
+                onPressed: () {
+                  if (playerOneWins) {
+                    //TODO (): Put in visual functionality for when we have a winner
+                    print('$playerOneName winner chicken dinner');
+                    adjustPlayerOpacity();
+                  } else if (playerTwoWins) {
+                    //TODO (): Put in visual functionality for when we have a winner
+                    print('$playerTwoName winner chicken dinner');
+                    adjustPlayerOpacity();
+                  }
+                  if (volumeOn) {
+                    _speak(
+                        playerOneScore: playerOneScore,
+                        playerTwoScore: playerTwoScore);
+                  }
+                  setState(() {});
+                },
+              ),
+              IconButton(
+                icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
+                iconSize: 64,
+                color: Colors.grey,
+                splashColor: Colors.greenAccent,
+                onPressed: () {
+                  changeVolume();
+                  setState(() {});
+                },
+              ),
             ],
           ),
           Expanded(
@@ -207,13 +241,8 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
   }
 
   void adjustPlayerOpacity() {
-    if (playerOneOpacity == 0.5) {
-      playerOneOpacity = 1.0;
-      playerTwoOpacity = 0.5;
-    } else if (playerTwoOpacity == 0.5) {
-      playerTwoOpacity = 1.0;
-      playerOneOpacity = 0.5;
-    }
+    playerOneOpacity = 0.5;
+    playerTwoOpacity = 0.5;
   }
 
   void changeVolume() {
@@ -262,7 +291,9 @@ class _ScoreboardHomeState extends State<ScoreboardHome> {
   void resetScores() {
     setState(() {
       playerTwoScore = 0;
+      playerOneOpacity = 1.0;
       playerOneScore = 0;
+      playerTwoOpacity = 1.0;
     });
   }
 }
