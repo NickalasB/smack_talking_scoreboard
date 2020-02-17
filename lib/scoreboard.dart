@@ -24,7 +24,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   String playerTwoName = strings.player2;
 
-  int scoreToWin = 0;
+  int scoreToWin;
 
   int playerOneScore = 0;
 
@@ -49,6 +49,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   TextEditingController player1TextEditingController;
   TextEditingController player2TextEditingController;
   TextEditingController ftwTextEditingController;
+
+  int playerOneWinCount = 0;
+  int playerTwoWinCount = 0;
+  bool playerTurnButtonEnabled = true;
 
   @override
   initState() {
@@ -151,8 +155,13 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
-    final playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
+    bool playerOneWins = false;
+    bool playerTwoWins = false;
+    if (scoreToWin != null) {
+      playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
+      playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
+    }
+
     return SafeArea(
       child: Scaffold(
         body: OrientationBuilder(
@@ -222,6 +231,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       opacity: playerOneOpacity,
       animation: animation,
       textEditingController: player1TextEditingController,
+      winCount: playerOneWinCount,
     );
   }
 
@@ -240,6 +250,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       opacity: playerTwoOpacity,
       animation: animation2,
       textEditingController: player2TextEditingController,
+      winCount: playerTwoWinCount,
     );
   }
 
@@ -263,22 +274,24 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       color: Colors.green,
       splashColor: Colors.greenAccent,
       onPressed: () {
-        if (playerOneWins) {
-          //TODO (): Put in visual functionality for when we have a winner
-          print('$playerOneName winner chicken dinner');
-          adjustPlayerOpacity();
-          animationController.forward(from: 0);
-        } else if (playerTwoWins) {
-          //TODO (): Put in visual functionality for when we have a winner
-          print('$playerTwoName winner chicken dinner');
-          adjustPlayerOpacity();
-          animationController2.forward(from: 0);
+        if (playerTurnButtonEnabled) {
+          if (playerOneWins) {
+            adjustPlayerOpacity();
+            animationController.forward(from: 0);
+            playerOneWinCount++;
+            playerTurnButtonEnabled = false;
+          } else if (playerTwoWins) {
+            adjustPlayerOpacity();
+            animationController2.forward(from: 0);
+            playerTwoWinCount++;
+            playerTurnButtonEnabled = false;
+          }
+          if (volumeOn) {
+            _speak(
+                playerOneScore: playerOneScore, playerTwoScore: playerTwoScore);
+          }
+          setState(() {});
         }
-        if (volumeOn) {
-          _speak(
-              playerOneScore: playerOneScore, playerTwoScore: playerTwoScore);
-        }
-        setState(() {});
       },
     );
   }
@@ -365,23 +378,24 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       playerOneOpacity = 1.0;
       playerOneScore = 0;
       playerTwoOpacity = 1.0;
+      playerTurnButtonEnabled = true;
     });
   }
 }
 
 class Player extends StatefulWidget {
-  const Player({
-    @required this.scoreDragFunction,
-    @required this.longPressFunction,
-    @required this.singleTapFunction,
-    @required this.nameFunction,
-    @required this.score,
-    @required this.color,
-    @required this.hint,
-    @required this.opacity,
-    @required this.animation,
-    @required this.textEditingController,
-  });
+  const Player(
+      {@required this.scoreDragFunction,
+      @required this.longPressFunction,
+      @required this.singleTapFunction,
+      @required this.nameFunction,
+      @required this.score,
+      @required this.color,
+      @required this.hint,
+      @required this.opacity,
+      @required this.animation,
+      @required this.textEditingController,
+      @required this.winCount});
 
   final Function scoreDragFunction;
   final Function longPressFunction;
@@ -393,6 +407,7 @@ class Player extends StatefulWidget {
   final double opacity;
   final Animation animation;
   final TextEditingController textEditingController;
+  final int winCount;
 
   @override
   _PlayerState createState() => _PlayerState();
@@ -423,30 +438,57 @@ class _PlayerState extends State<Player> {
           ),
         ),
         Expanded(
-          child: Opacity(
-            opacity: widget.opacity,
-            child: GestureDetector(
-                onVerticalDragEnd: (details) {
-                  if (enabled) widget.scoreDragFunction(details);
-                },
-                onLongPress: widget.longPressFunction,
-                onTap: enabled ? widget.singleTapFunction : null,
-                child: Container(
-                  width: double.infinity,
-                  color: widget.color,
-                  child: RotationTransition(
-                    turns: widget.animation,
-                    child: FittedBox(
-                      child: Text(
-                        widget.score.toString(),
-                        style: TextStyle(
-                          color: Colors.grey[200],
-                          fontSize: 220,
+          child: Stack(
+            children: <Widget>[
+              Opacity(
+                opacity: widget.opacity,
+                child: GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    if (enabled) widget.scoreDragFunction(details);
+                  },
+                  onLongPress: widget.longPressFunction,
+                  onTap: enabled ? widget.singleTapFunction : null,
+                  child: Container(
+                    width: double.infinity,
+                    color: widget.color,
+                    child: RotationTransition(
+                      turns: widget.animation,
+                      child: FittedBox(
+                        child: Text(
+                          widget.score.toString(),
+                          style: TextStyle(
+                            color: Colors.grey[200],
+                            fontSize: 220,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                )),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        strings.wins,
+                        style: TextStyle(color: Colors.grey[200], fontSize: 24),
+                      ),
+                      RotationTransition(
+                        turns: widget.animation,
+                        child: Text(
+                          widget.winCount.toString(),
+                          style:
+                              TextStyle(color: Colors.grey[200], fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ],
