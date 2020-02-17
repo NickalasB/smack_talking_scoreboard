@@ -15,7 +15,7 @@ class Scoreboard extends StatefulWidget {
 
 enum TtsState { PLAYING, STOPPED }
 
-class _ScoreboardState extends State<Scoreboard> {
+class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   FlutterTts flutterTts;
   dynamic languages;
   double volume = 0.5;
@@ -42,15 +42,32 @@ class _ScoreboardState extends State<Scoreboard> {
 
   double playerTwoOpacity = 1.0;
 
+  AnimationController animationController;
+  AnimationController animationController2;
+  Animation animation;
+  Animation animation2;
+  TextEditingController player1TextEditingController;
+  TextEditingController player2TextEditingController;
+  TextEditingController ftwTextEditingController;
+
   @override
   initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
     initTts();
+
+    animationController =
+        AnimationController(duration: Duration(seconds: 1), vsync: this);
+    animationController2 =
+        AnimationController(duration: Duration(seconds: 1), vsync: this);
+
+    animation =
+        CurvedAnimation(parent: animationController, curve: Curves.easeIn);
+    animation2 =
+        CurvedAnimation(parent: animationController2, curve: Curves.easeIn);
+
+    player1TextEditingController = TextEditingController();
+    player2TextEditingController = TextEditingController();
+    ftwTextEditingController = TextEditingController();
   }
 
   initTts() {
@@ -106,12 +123,12 @@ class _ScoreboardState extends State<Scoreboard> {
 
   @override
   void dispose() {
-    super.dispose();
     flutterTts.stop();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp,
-    ]);
+    animationController.dispose();
+    player1TextEditingController.dispose();
+    player2TextEditingController.dispose();
+    ftwTextEditingController.dispose();
+    super.dispose();
   }
 
   void _onChangePlayerOne(String text) {
@@ -134,108 +151,162 @@ class _ScoreboardState extends State<Scoreboard> {
 
   @override
   Widget build(BuildContext context) {
-    final playerOneWins = playerOneScore > 0 && playerOneScore == scoreToWin;
-    final playerTwoWins = playerTwoScore > 0 && playerTwoScore == scoreToWin;
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(children: [
-          Expanded(
-            child: Player(
-              scoreDragFunction: adjustPlayerOneScore,
-              longPressFunction: resetScores,
-              singleTapFunction: () {
-                playerOneScore++;
-                setState(() {});
-              },
-              nameFunction: _onChangePlayerOne,
-              score: playerOneScore,
-              color: Colors.red,
-              hint: (strings.player1),
-              opacity: playerOneOpacity,
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  SizedBox(height: 4),
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: new BoxDecoration(
-                      color: Colors.yellow[500],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: TextField(
-                        showCursor: true,
-                        onChanged: updateScoreToWin,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration.collapsed(
-                            hintText: strings.forTheWin),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
+    final playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
+    final playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
+    return SafeArea(
+      child: Scaffold(
+        body: OrientationBuilder(
+          builder: (context, _) {
+            return MediaQuery.of(context).orientation == Orientation.landscape
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(children: [
+                      Expanded(
+                        child: buildPlayer1(),
                       ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          buildFtwField(),
+                          buildPlayerTurnButton(playerOneWins, playerTwoWins),
+                          buildVolumeButton(),
+                        ],
+                      ),
+                      Expanded(
+                        child: buildPlayer2(),
+                      ),
+                    ]),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 24),
+                        Expanded(
+                          child: buildPlayer1(),
+                        ),
+                        SizedBox(height: 24),
+                        Expanded(
+                          child: buildPlayer2(),
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            buildFtwField(),
+                            buildPlayerTurnButton(playerOneWins, playerTwoWins),
+                            buildVolumeButton(),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: Icon(Icons.check_circle),
-                iconSize: 64,
-                color: Colors.green,
-                splashColor: Colors.greenAccent,
-                onPressed: () {
-                  if (playerOneWins) {
-                    //TODO (): Put in visual functionality for when we have a winner
-                    print('$playerOneName winner chicken dinner');
-                    adjustPlayerOpacity();
-                  } else if (playerTwoWins) {
-                    //TODO (): Put in visual functionality for when we have a winner
-                    print('$playerTwoName winner chicken dinner');
-                    adjustPlayerOpacity();
-                  }
-                  if (volumeOn) {
-                    _speak(
-                        playerOneScore: playerOneScore,
-                        playerTwoScore: playerTwoScore);
-                  }
-                  setState(() {});
-                },
-              ),
-              IconButton(
-                icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
-                iconSize: 64,
-                color: Colors.grey,
-                splashColor: Colors.greenAccent,
-                onPressed: () {
-                  changeVolume();
-                  setState(() {});
-                },
-              ),
-            ],
-          ),
-          Expanded(
-            child: Player(
-              scoreDragFunction: adjustPlayerTwoScore,
-              longPressFunction: resetScores,
-              singleTapFunction: () {
-                playerTwoScore++;
-                setState(() {});
-              },
-              nameFunction: _onChangePlayerTwo,
-              score: playerTwoScore,
-              color: Colors.blue,
-              hint: (strings.player2),
-              opacity: playerTwoOpacity,
+                  );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildPlayer1() {
+    return Player(
+      scoreDragFunction: adjustPlayerOneScore,
+      longPressFunction: resetScores,
+      singleTapFunction: () {
+        playerOneScore++;
+        setState(() {});
+      },
+      nameFunction: _onChangePlayerOne,
+      score: playerOneScore,
+      color: Colors.red,
+      hint: (strings.player1),
+      opacity: playerOneOpacity,
+      animation: animation,
+      textEditingController: player1TextEditingController,
+    );
+  }
+
+  Widget buildPlayer2() {
+    return Player(
+      scoreDragFunction: adjustPlayerTwoScore,
+      longPressFunction: resetScores,
+      singleTapFunction: () {
+        playerTwoScore++;
+        setState(() {});
+      },
+      nameFunction: _onChangePlayerTwo,
+      score: playerTwoScore,
+      color: Colors.blue,
+      hint: (strings.player2),
+      opacity: playerTwoOpacity,
+      animation: animation2,
+      textEditingController: player2TextEditingController,
+    );
+  }
+
+  Widget buildVolumeButton() {
+    return IconButton(
+      icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
+      iconSize: 64,
+      color: Colors.grey,
+      splashColor: Colors.greenAccent,
+      onPressed: () {
+        changeVolume();
+        setState(() {});
+      },
+    );
+  }
+
+  Widget buildPlayerTurnButton(bool playerOneWins, bool playerTwoWins) {
+    return IconButton(
+      icon: Icon(Icons.check_circle),
+      iconSize: 64,
+      color: Colors.green,
+      splashColor: Colors.greenAccent,
+      onPressed: () {
+        if (playerOneWins) {
+          //TODO (): Put in visual functionality for when we have a winner
+          print('$playerOneName winner chicken dinner');
+          adjustPlayerOpacity();
+          animationController.forward(from: 0);
+        } else if (playerTwoWins) {
+          //TODO (): Put in visual functionality for when we have a winner
+          print('$playerTwoName winner chicken dinner');
+          adjustPlayerOpacity();
+          animationController2.forward(from: 0);
+        }
+        if (volumeOn) {
+          _speak(
+              playerOneScore: playerOneScore, playerTwoScore: playerTwoScore);
+        }
+        setState(() {});
+      },
+    );
+  }
+
+  Widget buildFtwField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: 64,
+        height: 64,
+        decoration: new BoxDecoration(
+          color: Colors.yellow[500],
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: TextField(
+            showCursor: true,
+            onChanged: updateScoreToWin,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            controller: ftwTextEditingController,
+            decoration: InputDecoration.collapsed(hintText: strings.forTheWin),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
             ),
           ),
-        ]),
+        ),
       ),
     );
   }
@@ -308,6 +379,8 @@ class Player extends StatefulWidget {
     @required this.color,
     @required this.hint,
     @required this.opacity,
+    @required this.animation,
+    @required this.textEditingController,
   });
 
   final Function scoreDragFunction;
@@ -318,6 +391,8 @@ class Player extends StatefulWidget {
   final Color color;
   final String hint;
   final double opacity;
+  final Animation animation;
+  final TextEditingController textEditingController;
 
   @override
   _PlayerState createState() => _PlayerState();
@@ -329,7 +404,6 @@ class _PlayerState extends State<Player> {
     final enabled = widget.opacity == 1.0;
     return Column(
       children: <Widget>[
-        SizedBox(height: 24),
         Container(
           alignment: Alignment.topCenter,
           color: widget.color,
@@ -344,6 +418,7 @@ class _PlayerState extends State<Player> {
                 fontWeight: FontWeight.bold,
                 fontSize: 32,
               ),
+              controller: widget.textEditingController,
             ),
           ),
         ),
@@ -357,13 +432,17 @@ class _PlayerState extends State<Player> {
                 onLongPress: widget.longPressFunction,
                 onTap: enabled ? widget.singleTapFunction : null,
                 child: Container(
+                  width: double.infinity,
                   color: widget.color,
-                  child: Center(
-                    child: Text(
-                      widget.score.toString(),
-                      style: TextStyle(
-                        color: Colors.grey[200],
-                        fontSize: 220,
+                  child: RotationTransition(
+                    turns: widget.animation,
+                    child: FittedBox(
+                      child: Text(
+                        widget.score.toString(),
+                        style: TextStyle(
+                          color: Colors.grey[200],
+                          fontSize: 220,
+                        ),
                       ),
                     ),
                   ),

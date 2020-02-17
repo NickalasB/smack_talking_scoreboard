@@ -17,10 +17,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp,
-    ]);
+//    SystemChrome.setPreferredOrientations([
+//      DeviceOrientation.portraitDown,
+//      DeviceOrientation.portraitUp,
+//    ]);
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   }
 
