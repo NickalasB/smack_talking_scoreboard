@@ -421,7 +421,12 @@ class _PlayerState extends State<Player> {
       children: <Widget>[
         Container(
           alignment: Alignment.topCenter,
-          color: widget.color,
+          decoration: BoxDecoration(
+            color: widget.color,
+            borderRadius: BorderRadius.all(
+              Radius.circular(8),
+            ),
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextField(
@@ -437,6 +442,7 @@ class _PlayerState extends State<Player> {
             ),
           ),
         ),
+        SizedBox(height: 4),
         Expanded(
           child: Stack(
             children: <Widget>[
@@ -449,8 +455,12 @@ class _PlayerState extends State<Player> {
                   onLongPress: widget.longPressFunction,
                   onTap: enabled ? widget.singleTapFunction : null,
                   child: Container(
+                    decoration: BoxDecoration(
+                      color: widget.color,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
                     width: double.infinity,
-                    color: widget.color,
+                    height: double.infinity,
                     child: RotationTransition(
                       turns: widget.animation,
                       child: FittedBox(

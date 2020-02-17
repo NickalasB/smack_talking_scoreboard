@@ -79,7 +79,10 @@ class GameButton extends StatelessWidget {
         elevation: 4,
         child: Text(
           label,
-          style: TextStyle(fontSize: 64),
+          style: TextStyle(
+            fontSize: 64,
+            color: Colors.grey[200],
+          ),
           textAlign: TextAlign.center,
         ),
         color: color,
