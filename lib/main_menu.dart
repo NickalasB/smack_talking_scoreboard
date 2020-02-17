@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:smack_talking_scoreboard/scoreboard.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/tournament_menu.dart';
 
 class MainMenuScreen extends StatefulWidget {
   static const String id = 'main_menu';
@@ -14,16 +14,6 @@ class MainMenuScreen extends StatefulWidget {
 }
 
 class _MainMenuScreenState extends State<MainMenuScreen> {
-  @override
-  void initState() {
-    super.initState();
-//    SystemChrome.setPreferredOrientations([
-//      DeviceOrientation.portraitDown,
-//      DeviceOrientation.portraitUp,
-//    ]);
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,10 +34,12 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: GameButton(strings.singleGameLabel, Colors.red),
+                    child: GameButton(
+                        strings.singleGameLabel, Colors.red, Scoreboard.id),
                   ),
                   Expanded(
-                    child: GameButton(strings.tournamentLabel, Colors.blue),
+                    child: GameButton(strings.tournamentLabel, Colors.blue,
+                        TournamentMenu.id),
                   ),
                 ],
               ),
@@ -65,17 +57,18 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 }
 
 class GameButton extends StatelessWidget {
-  const GameButton(this.label, this.color);
+  const GameButton(this.label, this.color, this.routeId);
 
   final String label;
   final Color color;
+  final String routeId;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16),
       child: RaisedButton(
-        onPressed: () => Navigator.pushNamed(context, Scoreboard.id),
+        onPressed: () => Navigator.pushNamed(context, routeId),
         elevation: 4,
         child: Text(
           label,

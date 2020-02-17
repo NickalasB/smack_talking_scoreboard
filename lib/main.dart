@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smack_talking_scoreboard/scoreboard.dart';
+import 'package:smack_talking_scoreboard/tournament_menu.dart';
 
 import 'main_menu.dart';
 
@@ -13,6 +14,7 @@ class SmackTalkingScoreboard extends StatelessWidget {
       routes: {
         MainMenuScreen.id: (context) => const MainMenuScreen(),
         Scoreboard.id: (context) => const Scoreboard(),
+        TournamentMenu.id: (context) => const TournamentMenu(),
       },
       debugShowCheckedModeBanner: false,
     );
