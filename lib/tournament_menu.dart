@@ -20,112 +20,128 @@ class _TournamentMenuState extends State<TournamentMenu> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          children: <Widget>[
-            TextField(
-              showCursor: true,
-              textCapitalization: TextCapitalization.words,
-              onChanged: null,
-              decoration: InputDecoration(hintText: strings.tournamentName),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    strings.numberOfTeams,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    width: 64,
-                    child: DropdownButton<dynamic>(
-                      value: teamCountValue,
-                      icon: Icon(Icons.arrow_downward),
-                      iconSize: 24,
-                      elevation: 16,
-                      style: TextStyle(color: Colors.blue),
-                      underline: Container(
-                        height: 2,
-                        color: Colors.blueAccent,
+        body: OrientationBuilder(
+          builder: (context, _) {
+            final isLandscape =
+                MediaQuery.of(context).orientation == Orientation.landscape;
+
+            return Column(
+              children: <Widget>[
+                _TournamentTitle(),
+//                _DropDownsAndTeamCards(teamCountValue, isLandscape),
+                Expanded(
+                  child: Stack(
+                    children: <Widget>[
+                      FractionallySizedBox(
+                        widthFactor: isLandscape ? .5 : 1,
+                        heightFactor: isLandscape ? 1 : .33,
+                        child: Column(
+                          children: <Widget>[
+                            buildTeamCountDropDown(),
+                            buildRoundCountDropDown(),
+                          ],
+                        ),
                       ),
-                      onChanged: (dynamic newValue) {
-                        setState(() {
-                          teamCountValue = newValue;
-                        });
-                      },
-                      items: getDropdownItems([2, 4, 6, 8, 10, 12, 14, 16]),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    strings.numberOfRounds,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                    width: 64,
-                    child: DropdownButton<dynamic>(
-                      value: roundCountValue,
-                      icon: Icon(Icons.arrow_downward),
-                      iconSize: 24,
-                      elevation: 16,
-                      style: TextStyle(color: Colors.blue),
-                      underline: Container(
-                        height: 2,
-                        color: Colors.blueAccent,
+                      Stack(
+                        children: <Widget>[
+                          Align(
+                            alignment: isLandscape
+                                ? Alignment.centerRight
+                                : Alignment.bottomCenter,
+                            child: FractionallySizedBox(
+                              widthFactor: isLandscape ? .50 : 1,
+                              heightFactor: isLandscape ? 1 : .66,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: List.generate(teamCountValue, (i) {
+                                    return TeamCard(i + 1);
+                                  }),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      onChanged: (dynamic newValue) {
-                        setState(() {
-                          roundCountValue = newValue;
-                        });
-                      },
-                      items: getDropdownItems([1, 2, 3, 4, 5, 6]),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    ...getTeamWidgets(teamCountValue),
-                  ],
                 ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: RaisedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(strings.finish),
-              ),
-            ),
-          ],
+                const _FinishButton(),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  List<Widget> getTeamWidgets(int listSize) {
-    return List.generate(listSize, (i) {
-      return TeamCard(i + 1);
-    });
+  Padding buildRoundCountDropDown() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            strings.numberOfRounds,
+            style: TextStyle(fontSize: 24),
+          ),
+          Container(
+            width: 64,
+            child: DropdownButton<dynamic>(
+              value: roundCountValue,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 24,
+              elevation: 16,
+              style: TextStyle(color: Colors.blue),
+              underline: Container(
+                height: 2,
+                color: Colors.blueAccent,
+              ),
+              onChanged: (dynamic newValue) {
+                setState(() {
+                  roundCountValue = newValue;
+                });
+              },
+              items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding buildTeamCountDropDown() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            strings.numberOfTeams,
+            style: TextStyle(fontSize: 24),
+          ),
+          Container(
+            width: 64,
+            child: DropdownButton<dynamic>(
+              value: teamCountValue,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 24,
+              elevation: 16,
+              style: TextStyle(color: Colors.blue),
+              underline: Container(
+                height: 2,
+                color: Colors.blueAccent,
+              ),
+              onChanged: (dynamic newValue) {
+                setState(() {
+                  teamCountValue = newValue;
+                });
+              },
+              items: getDropdownItems([2, 4, 6, 8, 10, 12, 14, 16]),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   List<dynamic> getDropdownItems(List<dynamic> list) {
@@ -138,5 +154,42 @@ class _TournamentMenuState extends State<TournamentMenu> {
         ),
       );
     }).toList();
+  }
+}
+
+class _TournamentTitle extends StatelessWidget {
+  const _TournamentTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      showCursor: true,
+      textCapitalization: TextCapitalization.words,
+      onChanged: null,
+      decoration: InputDecoration(hintText: strings.tournamentName),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 32,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+class _FinishButton extends StatelessWidget {
+  const _FinishButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: RaisedButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(strings.finish),
+      ),
+    );
   }
 }
