@@ -33,7 +33,6 @@ class TeamCard extends StatelessWidget {
                 ),
                 TeamCardTextField(evenTeamNumber, strings.player1),
                 SizedBox(height: 24),
-
                 TeamCardTextField(evenTeamNumber, strings.player2),
                 SizedBox(height: 24)
               ],
