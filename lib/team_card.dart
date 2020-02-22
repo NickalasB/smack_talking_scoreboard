@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 
 class TeamCard extends StatelessWidget {
-  const TeamCard(this.teamNumber);
+  const TeamCard({@required this.teamNumber});
 
   final int teamNumber;
 

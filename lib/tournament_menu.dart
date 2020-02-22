@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smack_talking_scoreboard/bracket_screen.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
 
@@ -16,8 +17,13 @@ class TournamentMenuState extends State<TournamentMenu> {
   int teamCountValue = 2;
   int roundCountValue = 1;
 
+  List<TeamCard> teamCards;
+
   @override
   Widget build(BuildContext context) {
+    teamCards = List.generate(teamCountValue, (i) {
+      return TeamCard(teamNumber: i + 1);
+    });
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[300],
@@ -71,10 +77,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                                 heightFactor: isLandscape ? 1 : .66,
                                 child: SingleChildScrollView(
                                   child: Column(
-                                    children:
-                                        List.generate(teamCountValue, (i) {
-                                      return TeamCard(i + 1);
-                                    }),
+                                    children: teamCards,
                                   ),
                                 ),
                               ),
@@ -85,7 +88,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                     ],
                   ),
                 ),
-                const _FinishButton(),
+                _FinishButton(teamCards),
               ],
             );
           },
@@ -196,7 +199,9 @@ class TournamentDropdown extends StatelessWidget {
 }
 
 class _FinishButton extends StatelessWidget {
-  const _FinishButton();
+  const _FinishButton(this.teamCards);
+
+  final Iterable<TeamCard> teamCards;
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +213,8 @@ class _FinishButton extends StatelessWidget {
         child: RaisedButton(
           color: Colors.green,
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pushNamed(context, BracketScreen.id,
+                arguments: teamCards);
           },
           child: Text(
             strings.finish,
