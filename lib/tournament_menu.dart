@@ -20,6 +20,7 @@ class TournamentMenuState extends State<TournamentMenu> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.grey[300],
         body: OrientationBuilder(
           builder: (context, _) {
             final isLandscape =
@@ -35,42 +36,51 @@ class TournamentMenuState extends State<TournamentMenu> {
                         widthFactor: isLandscape ? .5 : 1,
                         heightFactor: isLandscape ? 1 : .33,
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            TournamentDropdown(
-                              label: strings.numberOfTeams,
-                              teamCountValue: teamCountValue,
-                              onChangedFunction: setTeamCountValue,
-                              items: getDropdownItems(
-                                  [2, 4, 6, 8, 10, 12, 14, 16, 32]),
+                            Expanded(
+                              child: TournamentDropdown(
+                                label: strings.numberOfTeams,
+                                teamCountValue: teamCountValue,
+                                onChangedFunction: setTeamCountValue,
+                                items: getDropdownItems(
+                                    [2, 4, 6, 8, 10, 12, 14, 16, 32]),
+                              ),
                             ),
-                            TournamentDropdown(
-                              label: strings.numberOfRounds,
-                              teamCountValue: roundCountValue,
-                              onChangedFunction: setRoundsValue,
-                              items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+                            Expanded(
+                              child: TournamentDropdown(
+                                label: strings.numberOfRounds,
+                                teamCountValue: roundCountValue,
+                                onChangedFunction: setRoundsValue,
+                                items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      Stack(
-                        children: <Widget>[
-                          Align(
-                            alignment: isLandscape
-                                ? Alignment.centerRight
-                                : Alignment.bottomCenter,
-                            child: FractionallySizedBox(
-                              widthFactor: isLandscape ? .50 : 1,
-                              heightFactor: isLandscape ? 1 : .66,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: List.generate(teamCountValue, (i) {
-                                    return TeamCard(i + 1);
-                                  }),
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Stack(
+                          children: <Widget>[
+                            Align(
+                              alignment: isLandscape
+                                  ? Alignment.centerRight
+                                  : Alignment.bottomCenter,
+                              child: FractionallySizedBox(
+                                widthFactor: isLandscape ? .50 : 1,
+                                heightFactor: isLandscape ? 1 : .66,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children:
+                                        List.generate(teamCountValue, (i) {
+                                      return TeamCard(i + 1);
+                                    }),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -96,9 +106,14 @@ class TournamentMenuState extends State<TournamentMenu> {
     return list.map<DropdownMenuItem<dynamic>>((dynamic value) {
       return DropdownMenuItem<dynamic>(
         value: value,
-        child: Text(
-          value.toString(),
-          style: TextStyle(fontSize: 24),
+        child: Container(
+          width: 124,
+          child: Center(
+            child: Text(
+              value.toString(),
+              style: TextStyle(fontSize: 48),
+            ),
+          ),
         ),
       );
     }).toList();
@@ -110,16 +125,20 @@ class _TournamentTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      showCursor: true,
-      textCapitalization: TextCapitalization.words,
-      onChanged: null,
-      decoration: InputDecoration(hintText: strings.tournamentName),
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 32,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: TextField(
+        maxLines: null,
+        showCursor: true,
+        textCapitalization: TextCapitalization.words,
+        onChanged: null,
+        decoration: InputDecoration(hintText: strings.tournamentName),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 64,
+        ),
+        textAlign: TextAlign.center,
       ),
-      textAlign: TextAlign.center,
     );
   }
 }
@@ -139,32 +158,38 @@ class TournamentDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 24),
-          ),
-          Container(
-            width: 64,
-            child: DropdownButton<dynamic>(
-              value: teamCountValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.blue),
-              underline: Container(
-                height: 2,
-                color: Colors.blueAccent,
-              ),
-              onChanged: onChangedFunction,
-              items: this.items,
+    return FittedBox(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(fontSize: 68),
             ),
-          ),
-        ],
+            Container(
+              height: 72,
+              child: DropdownButton<dynamic>(
+                value: teamCountValue,
+                icon: Icon(Icons.arrow_downward),
+                iconSize: 64,
+                elevation: 16,
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                underline: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 2,
+                    color: Colors.blue,
+                  ),
+                ),
+                onChanged: onChangedFunction,
+                items: this.items,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -177,12 +202,22 @@ class _FinishButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: RaisedButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        child: Text(strings.finish),
+      padding: EdgeInsets.fromLTRB(48, 16, 48, 16),
+      child: SizedBox(
+        height: 64,
+        child: RaisedButton(
+          color: Colors.green,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            strings.finish,
+            style: TextStyle(
+                fontSize: 32,
+                color: Colors.grey[200],
+                fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
     );
   }
