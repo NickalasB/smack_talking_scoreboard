@@ -9,10 +9,10 @@ class TournamentMenu extends StatefulWidget {
   const TournamentMenu();
 
   @override
-  _TournamentMenuState createState() => _TournamentMenuState();
+  TournamentMenuState createState() => TournamentMenuState();
 }
 
-class _TournamentMenuState extends State<TournamentMenu> {
+class TournamentMenuState extends State<TournamentMenu> {
   int teamCountValue = 2;
   int roundCountValue = 1;
 
@@ -28,7 +28,6 @@ class _TournamentMenuState extends State<TournamentMenu> {
             return Column(
               children: <Widget>[
                 _TournamentTitle(),
-//                _DropDownsAndTeamCards(teamCountValue, isLandscape),
                 Expanded(
                   child: Stack(
                     children: <Widget>[
@@ -37,8 +36,19 @@ class _TournamentMenuState extends State<TournamentMenu> {
                         heightFactor: isLandscape ? 1 : .33,
                         child: Column(
                           children: <Widget>[
-                            buildTeamCountDropDown(),
-                            buildRoundCountDropDown(),
+                            TournamentDropdown(
+                              label: strings.numberOfTeams,
+                              teamCountValue: teamCountValue,
+                              onChangedFunction: setTeamCountValue,
+                              items: getDropdownItems(
+                                  [2, 4, 6, 8, 10, 12, 14, 16, 32]),
+                            ),
+                            TournamentDropdown(
+                              label: strings.numberOfRounds,
+                              teamCountValue: roundCountValue,
+                              onChangedFunction: setRoundsValue,
+                              items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+                            ),
                           ],
                         ),
                       ),
@@ -74,75 +84,13 @@ class _TournamentMenuState extends State<TournamentMenu> {
     );
   }
 
-  Padding buildRoundCountDropDown() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            strings.numberOfRounds,
-            style: TextStyle(fontSize: 24),
-          ),
-          Container(
-            width: 64,
-            child: DropdownButton<dynamic>(
-              value: roundCountValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.blue),
-              underline: Container(
-                height: 2,
-                color: Colors.blueAccent,
-              ),
-              onChanged: (dynamic newValue) {
-                setState(() {
-                  roundCountValue = newValue;
-                });
-              },
-              items: getDropdownItems([1, 2, 3, 4, 5, 6]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  void setTeamCountValue(dynamic newValue) => setState(() {
+        teamCountValue = newValue;
+      });
 
-  Padding buildTeamCountDropDown() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            strings.numberOfTeams,
-            style: TextStyle(fontSize: 24),
-          ),
-          Container(
-            width: 64,
-            child: DropdownButton<dynamic>(
-              value: teamCountValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.blue),
-              underline: Container(
-                height: 2,
-                color: Colors.blueAccent,
-              ),
-              onChanged: (dynamic newValue) {
-                setState(() {
-                  teamCountValue = newValue;
-                });
-              },
-              items: getDropdownItems([2, 4, 6, 8, 10, 12, 14, 16]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  void setRoundsValue(dynamic newValue) => setState(() {
+        roundCountValue = newValue;
+      });
 
   List<dynamic> getDropdownItems(List<dynamic> list) {
     return list.map<DropdownMenuItem<dynamic>>((dynamic value) {
@@ -172,6 +120,52 @@ class _TournamentTitle extends StatelessWidget {
         fontSize: 32,
       ),
       textAlign: TextAlign.center,
+    );
+  }
+}
+
+class TournamentDropdown extends StatelessWidget {
+  const TournamentDropdown({
+    this.label,
+    this.teamCountValue,
+    this.onChangedFunction,
+    this.items,
+  });
+
+  final String label;
+  final int teamCountValue;
+  final Function onChangedFunction;
+  final List<DropdownMenuItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 24),
+          ),
+          Container(
+            width: 64,
+            child: DropdownButton<dynamic>(
+              value: teamCountValue,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 24,
+              elevation: 16,
+              style: TextStyle(color: Colors.blue),
+              underline: Container(
+                height: 2,
+                color: Colors.blueAccent,
+              ),
+              onChanged: onChangedFunction,
+              items: this.items,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
