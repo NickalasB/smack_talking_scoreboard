@@ -15,6 +15,7 @@ class TeamCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         children: <Widget>[
+          SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -38,7 +39,7 @@ class TeamCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 24)
+          SizedBox(height: 12)
         ],
       ),
     );
