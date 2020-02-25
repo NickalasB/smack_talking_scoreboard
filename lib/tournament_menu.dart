@@ -22,7 +22,11 @@ class TournamentMenuState extends State<TournamentMenu> {
   @override
   Widget build(BuildContext context) {
     teamCards = List.generate(teamCountValue, (i) {
-      return TeamCard(teamNumber: i + 1);
+      return TeamCard(
+        teamNumber: i + 1,
+        controller1: TextEditingController(),
+        controller2: TextEditingController(),
+      );
     });
     return SafeArea(
       child: Scaffold(
@@ -213,7 +217,7 @@ class _FinishButton extends StatelessWidget {
         child: RaisedButton(
           color: Colors.green,
           onPressed: () {
-            Navigator.pushNamed(context, BracketScreen.id,
+            Navigator.popAndPushNamed(context, BracketScreen.id,
                 arguments: teamCards);
           },
           child: Text(

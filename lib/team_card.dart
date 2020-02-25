@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 
 class TeamCard extends StatelessWidget {
-  const TeamCard({@required this.teamNumber});
+  const TeamCard(
+      {@required this.teamNumber,
+      @required this.controller1,
+      this.controller2});
 
   final int teamNumber;
+  final TextEditingController controller1;
+  final TextEditingController controller2;
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +37,9 @@ class TeamCard extends StatelessWidget {
                     color: Colors.grey[200],
                   ),
                 ),
-                TeamCardTextField(evenTeamNumber, strings.player1),
+                TeamCardTextField(evenTeamNumber, strings.player1, controller1),
                 SizedBox(height: 24),
-                TeamCardTextField(evenTeamNumber, strings.player2),
+                TeamCardTextField(evenTeamNumber, strings.player2, controller2),
                 SizedBox(height: 24)
               ],
             ),
@@ -47,18 +52,19 @@ class TeamCard extends StatelessWidget {
 }
 
 class TeamCardTextField extends StatelessWidget {
-  const TeamCardTextField(this.evenTeamNumber, this.hint);
+  const TeamCardTextField(this.evenTeamNumber, this.hint, this.controller);
 
   final bool evenTeamNumber;
   final String hint;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return TextField(
       showCursor: true,
       textCapitalization: TextCapitalization.words,
-      onChanged: null,
+      onChanged: (text) {},
+      controller: controller,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(

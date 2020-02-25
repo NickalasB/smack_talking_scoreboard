@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
+import 'package:smack_talking_scoreboard/scoreboard.dart';
 import 'package:smack_talking_scoreboard/team_card.dart';
 
 class BracketScreen extends StatelessWidget {
@@ -25,23 +26,26 @@ class BracketScreen extends StatelessWidget {
     final List<Widget> widgetList = [];
 
     partition<TeamCard>(teamCards, 2).forEach((twoTeamList) {
-      widgetList.add(Padding(
-        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-                color: Colors.green, width: 5.0, style: BorderStyle.solid),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              twoTeamList[0],
-              Text(
-                'VS',
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-              ),
-              twoTeamList[1],
-            ],
+      widgetList.add(GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed(Scoreboard.id),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: Colors.green, width: 5.0, style: BorderStyle.solid),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                twoTeamList[0],
+                Text(
+                  'VS',
+                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                ),
+                twoTeamList[1],
+              ],
+            ),
           ),
         ),
       ));
