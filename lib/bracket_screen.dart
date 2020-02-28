@@ -10,7 +10,6 @@ class BracketScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<TeamCard> teamCards = ModalRoute.of(context).settings.arguments;
-    teamCards.shuffle();
 
     return Scaffold(
       body: SafeArea(
@@ -27,7 +26,10 @@ class BracketScreen extends StatelessWidget {
 
     partition<TeamCard>(teamCards, 2).forEach((twoTeamList) {
       widgetList.add(GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(Scoreboard.id),
+        onTap: () => Navigator.of(context).pushNamed(Scoreboard.id, arguments: [
+          [twoTeamList[0].controller1.text, twoTeamList[0].controller2.text],
+          [teamCards[1].controller1.text, teamCards[1].controller2.text]
+        ]),
         child: Padding(
           padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: DecoratedBox(

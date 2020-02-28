@@ -18,11 +18,11 @@ enum TtsState { PLAYING, STOPPED }
 class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   FlutterTts flutterTts;
   dynamic languages;
-  double volume = 0.5;
+  double volume = 1.0;
 
-  String playerOneName = strings.player1;
+  String playerOneName;
 
-  String playerTwoName = strings.player2;
+  String playerTwoName;
 
   int scoreToWin;
 
@@ -56,7 +56,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   initState() {
-    super.initState();
     initTts();
 
     animationController =
@@ -72,6 +71,46 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController = TextEditingController();
     player2TextEditingController = TextEditingController();
     ftwTextEditingController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  didChangeDependencies() {
+    final arguments =
+        ModalRoute.of(context).settings.arguments as List<List<String>>;
+
+    final teamOneFirstName = arguments?.first?.first;
+    final teamOneSecondName = arguments?.first[1];
+    final teamTwoFirstName = arguments[1]?.first;
+    final teamTwoSecondName = arguments[1][1];
+
+    if (teamOneFirstName?.isNotEmpty == true &&
+        teamOneSecondName?.isNotEmpty == true) {
+      playerOneName = '${arguments.first.first} & ${arguments.first[1]}';
+    } else if (teamOneSecondName?.isEmpty == true &&
+        teamOneFirstName?.isNotEmpty == true) {
+      playerOneName = teamOneFirstName;
+    } else if (teamTwoFirstName?.isEmpty == true &&
+        teamOneSecondName?.isNotEmpty == true) {
+      playerOneName = teamOneSecondName;
+    } else {
+      playerOneName = strings.player1;
+    }
+
+    if (teamTwoFirstName?.isNotEmpty == true &&
+        teamTwoSecondName?.isNotEmpty == true) {
+      playerTwoName = '${arguments[1].first} & ${arguments[1][1]}';
+    } else if (teamTwoSecondName?.isEmpty == true &&
+        teamTwoFirstName?.isNotEmpty == true) {
+      playerTwoName = teamOneFirstName;
+    } else if (teamOneFirstName?.isEmpty == true &&
+        teamTwoSecondName?.isNotEmpty == true) {
+      playerTwoName = teamTwoSecondName;
+    } else {
+      playerTwoName = strings.player2;
+    }
+
+    super.didChangeDependencies();
   }
 
   initTts() {
@@ -232,6 +271,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       animation: animation,
       textEditingController: player1TextEditingController,
       winCount: playerOneWinCount,
+      playerName: playerOneName,
     );
   }
 
@@ -251,6 +291,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       animation: animation2,
       textEditingController: player2TextEditingController,
       winCount: playerTwoWinCount,
+      playerName: playerTwoName,
     );
   }
 
@@ -395,7 +436,8 @@ class Player extends StatefulWidget {
       @required this.opacity,
       @required this.animation,
       @required this.textEditingController,
-      @required this.winCount});
+      @required this.winCount,
+      this.playerName});
 
   final Function scoreDragFunction;
   final Function longPressFunction;
@@ -408,6 +450,7 @@ class Player extends StatefulWidget {
   final Animation animation;
   final TextEditingController textEditingController;
   final int winCount;
+  final String playerName;
 
   @override
   _PlayerState createState() => _PlayerState();
@@ -416,6 +459,7 @@ class Player extends StatefulWidget {
 class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
+    widget.textEditingController.text = widget.playerName;
     final enabled = widget.opacity == 1.0;
     return Column(
       children: <Widget>[

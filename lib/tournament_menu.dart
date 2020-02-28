@@ -205,10 +205,11 @@ class TournamentDropdown extends StatelessWidget {
 class _FinishButton extends StatelessWidget {
   const _FinishButton(this.teamCards);
 
-  final Iterable<TeamCard> teamCards;
+  final List<TeamCard> teamCards;
 
   @override
   Widget build(BuildContext context) {
+    teamCards.shuffle();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(48, 16, 48, 16),
