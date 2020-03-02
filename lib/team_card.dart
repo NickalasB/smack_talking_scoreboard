@@ -4,14 +4,17 @@ import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/top_level_functions.dart';
 
 class TeamCard extends StatelessWidget {
-  const TeamCard(
-      {@required this.teamNumber,
-      @required this.controller1,
-      this.controller2});
+  const TeamCard({
+    @required this.teamNumber,
+    @required this.controller1,
+    this.controller2,
+    @required this.numOfRounds,
+  });
 
   final int teamNumber;
   final TextEditingController controller1;
   final TextEditingController controller2;
+  final int numOfRounds;
 
   @override
   Widget build(BuildContext context) {

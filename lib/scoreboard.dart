@@ -33,6 +33,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   int scoreToWin;
 
+  int roundsToWin;
+
   int playerOneScore = 0;
 
   int playerTwoScore = 0;
@@ -87,6 +89,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
       final team1 = teamsFromArgs.first;
       final team2 = teamsFromArgs[1];
+
+      roundsToWin = team1.numOfRounds;
 
       final teamOneFirstName = team1.controller1.text;
       final teamOneSecondName = team1.controller2.text;
@@ -290,6 +294,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       animation: animation,
       textEditingController: player1TextEditingController,
       winCount: playerOneWinCount,
+      roundsToWin: roundsToWin,
       playerName: playerOneName,
     );
   }
@@ -320,6 +325,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       animation: animation2,
       textEditingController: player2TextEditingController,
       winCount: playerTwoWinCount,
+      roundsToWin: roundsToWin,
       playerName: playerTwoName,
     );
   }
@@ -467,6 +473,7 @@ class Player extends StatelessWidget {
       @required this.animation,
       this.textEditingController,
       @required this.winCount,
+      @required this.roundsToWin,
       this.playerName});
 
   final Function scoreDragFunction;
@@ -481,6 +488,7 @@ class Player extends StatelessWidget {
   final Animation animation;
   final TextEditingController textEditingController;
   final int winCount;
+  final int roundsToWin;
   final String playerName;
 
   @override
@@ -560,7 +568,10 @@ class Player extends StatelessWidget {
                       RotationTransition(
                         turns: animation,
                         child: Text(
-                          winCount.toString(),
+                          strings.winCountVsRoundCount(
+                            winCount: winCount.toString(),
+                            roundsToWin: roundsToWin.toString(),
+                          ),
                           style:
                               TextStyle(color: Colors.grey[200], fontSize: 24),
                         ),

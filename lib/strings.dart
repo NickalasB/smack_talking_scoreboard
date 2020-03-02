@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 const String mainMenuTitle = 'SMACK TALKING SCOREBOARD';
 const String singleGameLabel = 'Single Game';
 const String tournamentLabel = 'Tournament';
@@ -12,6 +14,10 @@ const String numberOfTeams = 'Number of Teams: ';
 const String numberOfRounds = 'Number of Rounds: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
+
+String winCountVsRoundCount(
+        {@required String winCount, @required String roundsToWin}) =>
+    '$winCount out of $roundsToWin';
 
 List<String> standardInsults(String playerToInsult) {
   List<String> insultList = [

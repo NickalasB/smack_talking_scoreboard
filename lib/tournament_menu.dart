@@ -26,6 +26,7 @@ class TournamentMenuState extends State<TournamentMenu> {
         teamNumber: i + 1,
         controller1: TextEditingController(),
         controller2: TextEditingController(),
+        numOfRounds: roundCountValue,
       );
     });
     return SafeArea(
