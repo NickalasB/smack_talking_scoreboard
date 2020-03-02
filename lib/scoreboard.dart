@@ -35,6 +35,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   int roundsToWin;
 
+  bool winnerVisible = false;
+
+  bool canResetScores = true;
+
   int playerOneScore = 0;
 
   int playerTwoScore = 0;
@@ -207,59 +211,96 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     bool playerOneWins = false;
     bool playerTwoWins = false;
+    bool gameOver = false;
+    String winningPlayerName;
     if (scoreToWin != null) {
       playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
       playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
     }
 
+    if (playerOneWinCount == roundsToWin) {
+      winningPlayerName = playerOneName;
+      gameOver = true;
+    } else if (playerTwoWinCount == roundsToWin) {
+      winningPlayerName = playerTwoName;
+      gameOver = true;
+    }
+
+    if (gameOver) {
+      winnerVisible = true;
+      canResetScores = false;
+    }
+
+    print('GameOver = $gameOver');
+
     return SafeArea(
       child: Scaffold(
         body: OrientationBuilder(
           builder: (context, _) {
-            return MediaQuery.of(context).orientation == Orientation.landscape
-                ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(children: [
-                      Expanded(
-                        child: buildPlayer1(),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          buildFtwField(),
-                          buildPlayerTurnButton(playerOneWins, playerTwoWins),
-                          buildVolumeButton(),
-                        ],
-                      ),
-                      Expanded(
-                        child: buildPlayer2(),
-                      ),
-                    ]),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 24),
-                        Expanded(
-                          child: buildPlayer1(),
-                        ),
-                        SizedBox(height: 24),
-                        Expanded(
-                          child: buildPlayer2(),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            return Stack(
+              children: <Widget>[
+                MediaQuery.of(context).orientation == Orientation.landscape
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
                           children: [
-                            buildFtwField(),
-                            buildPlayerTurnButton(playerOneWins, playerTwoWins),
-                            buildVolumeButton(),
+                            Expanded(
+                              child: buildPlayer1(),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                buildFtwField(),
+                                buildPlayerTurnButton(
+                                    playerOneWins, playerTwoWins),
+                                buildVolumeButton(),
+                              ],
+                            ),
+                            Expanded(
+                              child: buildPlayer2(),
+                            ),
                           ],
                         ),
-                      ],
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 24),
+                            Expanded(
+                              child: buildPlayer1(),
+                            ),
+                            SizedBox(height: 24),
+                            Expanded(
+                              child: buildPlayer2(),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                buildFtwField(),
+                                buildPlayerTurnButton(
+                                    playerOneWins, playerTwoWins),
+                                buildVolumeButton(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                Visibility(
+                  visible: winnerVisible,
+                  child: Center(
+                    child: FittedBox(
+                      child: Text(
+                        strings.winningPlayerName(winningPlayerName),
+                        style: TextStyle(fontSize: 300),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  );
+                  ),
+                ),
+              ],
+            );
           },
         ),
       ),
@@ -449,13 +490,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void resetScores() {
-    setState(() {
-      playerTwoScore = 0;
-      playerOneOpacity = 1.0;
-      playerOneScore = 0;
-      playerTwoOpacity = 1.0;
-      playerTurnButtonEnabled = true;
-    });
+    if (canResetScores) {
+      setState(() {
+        playerTwoScore = 0;
+        playerOneOpacity = 1.0;
+        playerOneScore = 0;
+        playerTwoOpacity = 1.0;
+        playerTurnButtonEnabled = true;
+      });
+    }
   }
 }
 

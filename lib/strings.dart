@@ -19,6 +19,10 @@ String winCountVsRoundCount(
         {@required String winCount, @required String roundsToWin}) =>
     '$winCount out of $roundsToWin';
 
+String winningPlayerName(String playerName) => playerName?.contains('&') == true
+    ? '$playerName win!'
+    : '$playerName wins!';
+
 List<String> standardInsults(String playerToInsult) {
   List<String> insultList = [
     '$playerToInsult. Are your eyes even open while you\'re playing?',
