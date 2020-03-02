@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/top_level_functions.dart';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -18,6 +20,11 @@ enum TtsState { PLAYING, STOPPED }
 class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   FlutterTts flutterTts;
   dynamic languages;
+
+  List<List<TeamCard>> arguments;
+
+  List<TeamCard> teamsFromArgs;
+
   double volume = 1.0;
 
   String playerOneName;
@@ -76,38 +83,45 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   didChangeDependencies() {
-    final arguments =
-        ModalRoute.of(context).settings.arguments as List<List<String>>;
+    arguments = ModalRoute.of(context).settings.arguments;
 
-    final teamOneFirstName = arguments?.first?.first;
-    final teamOneSecondName = arguments?.first[1];
-    final teamTwoFirstName = arguments[1]?.first;
-    final teamTwoSecondName = arguments[1][1];
+    if (arguments != null) {
+      teamsFromArgs = arguments?.expand((i) => i)?.toList();
 
-    if (teamOneFirstName?.isNotEmpty == true &&
-        teamOneSecondName?.isNotEmpty == true) {
-      playerOneName = '${arguments.first.first} & ${arguments.first[1]}';
-    } else if (teamOneSecondName?.isEmpty == true &&
-        teamOneFirstName?.isNotEmpty == true) {
-      playerOneName = teamOneFirstName;
-    } else if (teamTwoFirstName?.isEmpty == true &&
-        teamOneSecondName?.isNotEmpty == true) {
-      playerOneName = teamOneSecondName;
-    } else {
-      playerOneName = strings.player1;
-    }
+      final team1 = teamsFromArgs.first;
+      final team2 = teamsFromArgs[1];
 
-    if (teamTwoFirstName?.isNotEmpty == true &&
-        teamTwoSecondName?.isNotEmpty == true) {
-      playerTwoName = '${arguments[1].first} & ${arguments[1][1]}';
-    } else if (teamTwoSecondName?.isEmpty == true &&
-        teamTwoFirstName?.isNotEmpty == true) {
-      playerTwoName = teamOneFirstName;
-    } else if (teamOneFirstName?.isEmpty == true &&
-        teamTwoSecondName?.isNotEmpty == true) {
-      playerTwoName = teamTwoSecondName;
-    } else {
-      playerTwoName = strings.player2;
+      final teamOneFirstName = team1.controller1.text;
+      final teamOneSecondName = team1.controller2.text;
+
+      final teamTwoFirstName = team2.controller1.text;
+      final teamTwoSecondName = team2.controller2.text;
+
+      if (teamOneFirstName?.isNotEmpty == true &&
+          teamOneSecondName?.isNotEmpty == true) {
+        playerOneName = '$teamOneFirstName & $teamOneSecondName';
+      } else if (teamOneSecondName?.isEmpty == true &&
+          teamOneFirstName?.isEmpty != true) {
+        playerOneName = teamOneFirstName;
+      } else if (teamTwoFirstName?.isEmpty == true &&
+          teamOneSecondName?.isEmpty != true) {
+        playerOneName = teamOneSecondName;
+      } else {
+        playerOneName = strings.player1;
+      }
+
+      if (teamTwoFirstName?.isNotEmpty == true &&
+          teamTwoSecondName?.isNotEmpty == true) {
+        playerTwoName = '$teamTwoFirstName & $teamTwoSecondName';
+      } else if (teamTwoSecondName?.isEmpty == true &&
+          teamTwoFirstName?.isEmpty != true) {
+        playerTwoName = teamOneFirstName;
+      } else if (teamOneFirstName?.isEmpty == true &&
+          teamTwoSecondName?.isEmpty != true) {
+        playerTwoName = teamTwoSecondName;
+      } else {
+        playerTwoName = strings.player2;
+      }
     }
 
     super.didChangeDependencies();
@@ -145,10 +159,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     String playerToInsult = '';
     List<String> insultList = [];
     if (playerOneScore < playerTwoScore) {
-      playerToInsult = playerOneName;
+      playerToInsult = playerOneName ?? strings.player1;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore > playerTwoScore) {
-      playerToInsult = playerTwoName;
+      playerToInsult = playerTwoName ?? strings.player2;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore == playerTwoScore) {
       insultList = strings.tieGameInsults();
@@ -175,15 +189,11 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void _onChangePlayerOne(String text) {
-    setState(() {
-      playerOneName = text.isNotEmpty ? text : strings.player1;
-    });
+    playerOneName = text;
   }
 
   void _onChangePlayerTwo(String text) {
-    setState(() {
-      playerTwoName = text.isNotEmpty ? text : strings.player2;
-    });
+    playerTwoName = text;
   }
 
   void updateScoreToWin(String text) {
@@ -256,6 +266,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   Widget buildPlayer1() {
+    Color teamFromArgsColor;
+    Color teamFromArgsCursorColor;
+    if (teamsFromArgs != null) {
+      teamFromArgsColor =
+          generateProperTeamColor(teamsFromArgs.first.teamNumber);
+      teamFromArgsCursorColor =
+          generateProperHintColor(teamsFromArgs.first.teamNumber);
+    }
+
     return Player(
       scoreDragFunction: adjustPlayerOneScore,
       longPressFunction: resetScores,
@@ -265,7 +284,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       },
       nameFunction: _onChangePlayerOne,
       score: playerOneScore,
-      color: Colors.red,
+      color: teamFromArgsColor == null ? Colors.red : teamFromArgsColor,
+      cursorColor: teamFromArgsColor == null
+          ? Colors.grey[400]
+          : teamFromArgsCursorColor,
       hint: (strings.player1),
       opacity: playerOneOpacity,
       animation: animation,
@@ -276,6 +298,14 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   Widget buildPlayer2() {
+    Color teamFromArgsColor;
+    Color teamFromArgsCursorColor;
+
+    if (teamsFromArgs != null) {
+      teamFromArgsColor = generateProperTeamColor(teamsFromArgs[1].teamNumber);
+      teamFromArgsCursorColor =
+          generateProperHintColor(teamsFromArgs[1].teamNumber);
+    }
     return Player(
       scoreDragFunction: adjustPlayerTwoScore,
       longPressFunction: resetScores,
@@ -285,7 +315,9 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       },
       nameFunction: _onChangePlayerTwo,
       score: playerTwoScore,
-      color: Colors.blue,
+      color: teamFromArgsColor == null ? Colors.blue : teamFromArgsColor,
+      cursorColor:
+          teamFromArgsColor == null ? Colors.black45 : teamFromArgsCursorColor,
       hint: (strings.player2),
       opacity: playerTwoOpacity,
       animation: animation2,
@@ -432,6 +464,7 @@ class Player extends StatefulWidget {
       @required this.nameFunction,
       @required this.score,
       @required this.color,
+      @required this.cursorColor,
       @required this.hint,
       @required this.opacity,
       @required this.animation,
@@ -445,6 +478,7 @@ class Player extends StatefulWidget {
   final Function nameFunction;
   final int score;
   final Color color;
+  final Color cursorColor;
   final String hint;
   final double opacity;
   final Animation animation;
@@ -476,6 +510,7 @@ class _PlayerState extends State<Player> {
             child: TextField(
               showCursor: true,
               textCapitalization: TextCapitalization.words,
+              cursorColor: widget.cursorColor,
               onChanged: widget.nameFunction,
               decoration: InputDecoration(hintText: widget.hint),
               style: TextStyle(

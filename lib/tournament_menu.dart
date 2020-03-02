@@ -209,7 +209,6 @@ class _FinishButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    teamCards.shuffle();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(48, 16, 48, 16),
