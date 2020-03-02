@@ -563,17 +563,24 @@ class Player extends StatelessWidget {
                     children: [
                       Text(
                         strings.wins,
-                        style: TextStyle(color: Colors.grey[200], fontSize: 24),
+                        style: TextStyle(
+                            color: Colors.grey[200],
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold),
                       ),
                       RotationTransition(
                         turns: animation,
                         child: Text(
-                          strings.winCountVsRoundCount(
-                            winCount: winCount.toString(),
-                            roundsToWin: roundsToWin.toString(),
-                          ),
-                          style:
-                              TextStyle(color: Colors.grey[200], fontSize: 24),
+                          roundsToWin != null
+                              ? strings.winCountVsRoundCount(
+                                  winCount: winCount.toString(),
+                                  roundsToWin: roundsToWin.toString(),
+                                )
+                              : winCount.toString(),
+                          style: TextStyle(
+                              color: Colors.grey[200],
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
