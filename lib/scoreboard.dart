@@ -75,9 +75,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     animation2 =
         CurvedAnimation(parent: animationController2, curve: Curves.easeIn);
 
-    player1TextEditingController = TextEditingController();
-    player2TextEditingController = TextEditingController();
-    ftwTextEditingController = TextEditingController();
     super.initState();
   }
 
@@ -119,6 +116,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
         playerTwoName = teamTwoSecondName;
       }
     }
+
+    player1TextEditingController = TextEditingController(text: playerOneName);
+    player2TextEditingController = TextEditingController(text: playerTwoName);
+    ftwTextEditingController = TextEditingController();
 
     super.didChangeDependencies();
   }
@@ -452,7 +453,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 }
 
-class Player extends StatefulWidget {
+class Player extends StatelessWidget {
   const Player(
       {@required this.scoreDragFunction,
       @required this.longPressFunction,
@@ -464,7 +465,7 @@ class Player extends StatefulWidget {
       @required this.hint,
       @required this.opacity,
       @required this.animation,
-      @required this.textEditingController,
+      this.textEditingController,
       @required this.winCount,
       this.playerName});
 
@@ -483,20 +484,14 @@ class Player extends StatefulWidget {
   final String playerName;
 
   @override
-  _PlayerState createState() => _PlayerState();
-}
-
-class _PlayerState extends State<Player> {
-  @override
   Widget build(BuildContext context) {
-    widget.textEditingController.text = widget.playerName;
-    final enabled = widget.opacity == 1.0;
+    final enabled = opacity == 1.0;
     return Column(
       children: <Widget>[
         Container(
           alignment: Alignment.topCenter,
           decoration: BoxDecoration(
-            color: widget.color,
+            color: color,
             borderRadius: BorderRadius.all(
               Radius.circular(8),
             ),
@@ -506,14 +501,15 @@ class _PlayerState extends State<Player> {
             child: TextField(
               showCursor: true,
               textCapitalization: TextCapitalization.words,
-              cursorColor: widget.cursorColor,
-              onChanged: widget.nameFunction,
-              decoration: InputDecoration(hintText: widget.hint),
+              cursorColor: cursorColor,
+              onChanged: nameFunction,
+              decoration: InputDecoration(hintText: hint),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 32,
+                color: Colors.grey[200],
               ),
-              controller: widget.textEditingController,
+              controller: textEditingController,
             ),
           ),
         ),
@@ -522,25 +518,25 @@ class _PlayerState extends State<Player> {
           child: Stack(
             children: <Widget>[
               Opacity(
-                opacity: widget.opacity,
+                opacity: opacity,
                 child: GestureDetector(
                   onVerticalDragEnd: (details) {
-                    if (enabled) widget.scoreDragFunction(details);
+                    if (enabled) scoreDragFunction(details);
                   },
-                  onLongPress: widget.longPressFunction,
-                  onTap: enabled ? widget.singleTapFunction : null,
+                  onLongPress: longPressFunction,
+                  onTap: enabled ? singleTapFunction : null,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: widget.color,
+                      color: color,
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     width: double.infinity,
                     height: double.infinity,
                     child: RotationTransition(
-                      turns: widget.animation,
+                      turns: animation,
                       child: FittedBox(
                         child: Text(
-                          widget.score.toString(),
+                          score.toString(),
                           style: TextStyle(
                             color: Colors.grey[200],
                             fontSize: 220,
@@ -562,9 +558,9 @@ class _PlayerState extends State<Player> {
                         style: TextStyle(color: Colors.grey[200], fontSize: 24),
                       ),
                       RotationTransition(
-                        turns: widget.animation,
+                        turns: animation,
                         child: Text(
-                          widget.winCount.toString(),
+                          winCount.toString(),
                           style:
                               TextStyle(color: Colors.grey[200], fontSize: 24),
                         ),
