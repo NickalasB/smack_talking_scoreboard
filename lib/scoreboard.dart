@@ -106,8 +106,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       } else if (teamTwoFirstName?.isEmpty == true &&
           teamOneSecondName?.isEmpty != true) {
         playerOneName = teamOneSecondName;
-      } else {
-        playerOneName = strings.player1;
       }
 
       if (teamTwoFirstName?.isNotEmpty == true &&
@@ -119,8 +117,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       } else if (teamOneFirstName?.isEmpty == true &&
           teamTwoSecondName?.isEmpty != true) {
         playerTwoName = teamTwoSecondName;
-      } else {
-        playerTwoName = strings.player2;
       }
     }
 
