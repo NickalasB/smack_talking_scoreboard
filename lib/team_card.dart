@@ -9,12 +9,14 @@ class TeamCard extends StatelessWidget {
     @required this.controller1,
     this.controller2,
     @required this.numOfRounds,
+    @required this.ftwScore,
   });
 
   final int teamNumber;
   final TextEditingController controller1;
   final TextEditingController controller2;
   final int numOfRounds;
+  final int ftwScore;
 
   @override
   Widget build(BuildContext context) {

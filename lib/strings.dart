@@ -15,6 +15,12 @@ const String numberOfRounds = 'Number of Rounds: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
 
+const String versus = 'VS';
+String teamCardTitle(int ftwScore, int numberOfRounds) {
+  final plural = numberOfRounds > 1;
+  return 'First to ${ftwScore.toString()}: ${numberOfRounds.toString()} ${plural ? 'Rounds' : 'Round'}';
+}
+
 String winCountVsRoundCount(
         {@required String winCount, @required String roundsToWin}) =>
     '$winCount out of $roundsToWin';

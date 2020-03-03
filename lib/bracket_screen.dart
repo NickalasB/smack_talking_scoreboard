@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 import 'package:smack_talking_scoreboard/scoreboard.dart';
+import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
 
 class BracketScreen extends StatefulWidget {
@@ -50,6 +51,9 @@ class _BracketScreenState extends State<BracketScreen> {
     final List<Widget> widgetList = [];
 
     partition<TeamCard>(teamCards, 2).forEach((twoTeamList) {
+      final ftwScore = twoTeamList.first.ftwScore;
+      final numberOfRounds = twoTeamList.first.numOfRounds;
+
       widgetList.add(GestureDetector(
         onTap: () => Navigator.of(context).pushNamed(
           Scoreboard.id,
@@ -61,13 +65,24 @@ class _BracketScreenState extends State<BracketScreen> {
             decoration: BoxDecoration(
               border: Border.all(
                   color: Colors.green, width: 5.0, style: BorderStyle.solid),
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Text(
+                    strings.teamCardTitle(ftwScore, numberOfRounds),
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 twoTeamList[0],
                 Text(
-                  'VS',
+                  strings.versus,
                   style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 ),
                 twoTeamList[1],

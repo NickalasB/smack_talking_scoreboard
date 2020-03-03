@@ -16,6 +16,7 @@ class TournamentMenu extends StatefulWidget {
 class TournamentMenuState extends State<TournamentMenu> {
   int teamCountValue = 2;
   int roundCountValue = 1;
+  int ftwValue = 7;
 
   List<TeamCard> teamCards;
 
@@ -27,6 +28,7 @@ class TournamentMenuState extends State<TournamentMenu> {
         controller1: TextEditingController(),
         controller2: TextEditingController(),
         numOfRounds: roundCountValue,
+        ftwScore: ftwValue,
       );
     });
     return SafeArea(
@@ -47,12 +49,13 @@ class TournamentMenuState extends State<TournamentMenu> {
                         widthFactor: isLandscape ? .5 : 1,
                         heightFactor: isLandscape ? 1 : .33,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Expanded(
                               child: TournamentDropdown(
                                 label: strings.numberOfTeams,
-                                teamCountValue: teamCountValue,
+                                dropDownValue: teamCountValue,
                                 onChangedFunction: setTeamCountValue,
                                 items: getDropdownItems(
                                     [2, 4, 6, 8, 10, 12, 14, 16, 32]),
@@ -61,9 +64,39 @@ class TournamentMenuState extends State<TournamentMenu> {
                             Expanded(
                               child: TournamentDropdown(
                                 label: strings.numberOfRounds,
-                                teamCountValue: roundCountValue,
+                                dropDownValue: roundCountValue,
                                 onChangedFunction: setRoundsValue,
                                 items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+                              ),
+                            ),
+                            Expanded(
+                              child: TournamentDropdown(
+                                label: 'Score For The Win:',
+                                dropDownValue: ftwValue,
+                                onChangedFunction: setFtwValue,
+                                items: getDropdownItems([
+                                  1,
+                                  2,
+                                  3,
+                                  4,
+                                  5,
+                                  6,
+                                  7,
+                                  8,
+                                  9,
+                                  10,
+                                  11,
+                                  12,
+                                  13,
+                                  14,
+                                  15,
+                                  16,
+                                  17,
+                                  18,
+                                  19,
+                                  20,
+                                  21,
+                                ]),
                               ),
                             ),
                           ],
@@ -110,6 +143,10 @@ class TournamentMenuState extends State<TournamentMenu> {
         roundCountValue = newValue;
       });
 
+  void setFtwValue(dynamic newValue) => setState(() {
+        ftwValue = newValue;
+      });
+
   List<dynamic> getDropdownItems(List<dynamic> list) {
     return list.map<DropdownMenuItem<dynamic>>((dynamic value) {
       return DropdownMenuItem<dynamic>(
@@ -154,13 +191,13 @@ class _TournamentTitle extends StatelessWidget {
 class TournamentDropdown extends StatelessWidget {
   const TournamentDropdown({
     this.label,
-    this.teamCountValue,
+    this.dropDownValue,
     this.onChangedFunction,
     this.items,
   });
 
   final String label;
-  final int teamCountValue;
+  final int dropDownValue;
   final Function onChangedFunction;
   final List<DropdownMenuItem> items;
 
@@ -179,7 +216,7 @@ class TournamentDropdown extends StatelessWidget {
             Container(
               height: 72,
               child: DropdownButton<dynamic>(
-                value: teamCountValue,
+                value: dropDownValue,
                 icon: Icon(Icons.arrow_downward),
                 iconSize: 64,
                 elevation: 16,
