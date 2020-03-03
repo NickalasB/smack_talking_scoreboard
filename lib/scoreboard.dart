@@ -96,6 +96,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
       roundsToWin = team1.numOfRounds;
 
+      scoreToWin = team1.ftwScore;
+
       final teamOneFirstName = team1.controller1.text;
       final teamOneSecondName = team1.controller2.text;
 
@@ -127,7 +129,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
     player1TextEditingController = TextEditingController(text: playerOneName);
     player2TextEditingController = TextEditingController(text: playerTwoName);
-    ftwTextEditingController = TextEditingController();
+    ftwTextEditingController =
+        TextEditingController(text: scoreToWin.toString());
 
     super.didChangeDependencies();
   }
@@ -219,10 +222,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     }
 
     if (playerOneWinCount == roundsToWin) {
-      winningPlayerName = playerOneName;
+      winningPlayerName = playerOneName ?? strings.player1;
       gameOver = true;
     } else if (playerTwoWinCount == roundsToWin) {
-      winningPlayerName = playerTwoName;
+      winningPlayerName = playerTwoName ?? strings.player2;
       gameOver = true;
     }
 
