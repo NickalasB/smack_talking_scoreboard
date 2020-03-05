@@ -9,8 +9,6 @@ import 'package:smack_talking_scoreboard/top_level_functions.dart';
 
 import 'models/winners.dart';
 
-const gameWinnerPrefsKey = 'victorious_team';
-
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
 
