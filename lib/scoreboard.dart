@@ -2,9 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
 import 'package:smack_talking_scoreboard/top_level_functions.dart';
+
+import 'models/winners.dart';
+
+const gameWinnerPrefsKey = 'victorious_team';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -216,6 +221,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     bool playerTwoWins = false;
     bool gameOver = false;
     String winningPlayerName;
+    int winningTeamNumber;
     if (scoreToWin != null) {
       playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
       playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
@@ -224,14 +230,17 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     if (playerOneWinCount == roundsToWin) {
       winningPlayerName = playerOneName ?? strings.player1;
       gameOver = true;
+      winningTeamNumber = teamsFromArgs.first.teamNumber;
     } else if (playerTwoWinCount == roundsToWin) {
       winningPlayerName = playerTwoName ?? strings.player2;
       gameOver = true;
+      winningTeamNumber = teamsFromArgs[1].teamNumber;
     }
 
     if (gameOver) {
       winnerVisible = true;
       canResetScores = false;
+      Provider.of<Winners>(context).winners.add(winningTeamNumber);
     }
 
     print('GameOver = $gameOver');

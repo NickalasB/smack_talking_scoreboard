@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
+
+import 'models/winners.dart';
 
 class TournamentMenu extends StatefulWidget {
   static const String id = 'tournamentMenu';
@@ -255,6 +258,8 @@ class _FinishButton extends StatelessWidget {
         child: RaisedButton(
           color: Colors.green,
           onPressed: () {
+            Provider.of<Winners>(context, listen: false).winners?.clear();
+
             Navigator.popAndPushNamed(context, BracketScreen.id,
                 arguments: teamCards);
           },
