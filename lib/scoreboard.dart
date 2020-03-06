@@ -133,7 +133,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController = TextEditingController(text: playerOneName);
     player2TextEditingController = TextEditingController(text: playerTwoName);
     ftwTextEditingController =
-        TextEditingController(text: scoreToWin.toString());
+        TextEditingController(text: scoreToWin?.toString());
 
     super.didChangeDependencies();
   }
