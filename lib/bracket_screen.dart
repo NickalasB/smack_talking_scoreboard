@@ -58,11 +58,19 @@ class _BracketScreenState extends State<BracketScreen> {
       final ftwScore = twoTeamList.first.ftwScore;
       final numberOfRounds = twoTeamList.first.numOfRounds;
 
+      final firstTeam = twoTeamList.first;
+      final secondTeam = twoTeamList[1];
+
       widgetList.add(GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(
-          Scoreboard.id,
-          arguments: [twoTeamList],
-        ),
+        onTap: () {
+          if (!noWinnerOrLoser(winners, firstTeam, secondTeam)) {
+            return null;
+          }
+          return Navigator.of(context).pushNamed(
+            Scoreboard.id,
+            arguments: [twoTeamList],
+          );
+        },
         child: Padding(
           padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: DecoratedBox(
@@ -75,23 +83,26 @@ class _BracketScreenState extends State<BracketScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Text(
-                    strings.teamCardTitle(ftwScore, numberOfRounds),
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: FittedBox(
+                    child: Center(
+                      child: Text(
+                        strings.teamCardTitle(ftwScore, numberOfRounds),
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 Opacity(
                   opacity: winners.isEmpty ||
-                          winners.contains(twoTeamList.first.teamNumber) ||
-                          noWinnerOrLoser(winners, twoTeamList)
+                          winners.contains(firstTeam.teamNumber) ||
+                          noWinnerOrLoser(winners, firstTeam, secondTeam)
                       ? 1.0
                       : .5,
-                  child:
-                      IgnorePointer(ignoring: true, child: twoTeamList.first),
+                  child: IgnorePointer(ignoring: true, child: firstTeam),
                 ),
                 Text(
                   strings.versus,
@@ -99,11 +110,11 @@ class _BracketScreenState extends State<BracketScreen> {
                 ),
                 Opacity(
                   opacity: winners.isEmpty ||
-                          winners.contains(twoTeamList[1].teamNumber) ||
-                          noWinnerOrLoser(winners, twoTeamList)
+                          winners.contains(secondTeam.teamNumber) ||
+                          noWinnerOrLoser(winners, firstTeam, secondTeam)
                       ? 1.0
                       : .5,
-                  child: IgnorePointer(ignoring: true, child: twoTeamList[1]),
+                  child: IgnorePointer(ignoring: true, child: secondTeam),
                 ),
               ],
             ),
@@ -114,8 +125,9 @@ class _BracketScreenState extends State<BracketScreen> {
     return widgetList;
   }
 
-  bool noWinnerOrLoser(List<int> winners, List<TeamCard> twoTeamList) {
-    return (!winners.contains(twoTeamList.first.teamNumber) &&
-        !winners.contains(twoTeamList[1].teamNumber));
+  bool noWinnerOrLoser(
+      List<int> winners, TeamCard topTeam, TeamCard bottomTeam) {
+    return (!winners.contains(topTeam.teamNumber) &&
+        !winners.contains(bottomTeam.teamNumber));
   }
 }
