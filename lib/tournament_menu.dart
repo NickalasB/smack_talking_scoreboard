@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/ui_components/components.dart';
 
 import 'models/winners.dart';
 
@@ -250,28 +251,14 @@ class _FinishButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(48, 16, 48, 16),
-      child: SizedBox(
-        height: 64,
-        child: RaisedButton(
-          color: Colors.green,
-          onPressed: () {
-            Provider.of<Winners>(context, listen: false).winners?.clear();
+    return ActionButton(
+      onPressedFunction: () {
+        Provider.of<Winners>(context, listen: false).winners?.clear();
 
-            Navigator.popAndPushNamed(context, BracketScreen.id,
-                arguments: teamCards);
-          },
-          child: Text(
-            strings.finish,
-            style: TextStyle(
-                fontSize: 32,
-                color: Colors.grey[200],
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
+        Navigator.popAndPushNamed(context, BracketScreen.id,
+            arguments: teamCards);
+      },
+      label: strings.finish,
     );
   }
 }

@@ -219,7 +219,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     bool playerTwoWins = false;
     bool gameOver = false;
     String winningPlayerName;
-    int winningTeamNumber;
+    TeamCard winningTeam;
     if (scoreToWin != null) {
       playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
       playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
@@ -228,17 +228,20 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     if (playerOneWinCount == roundsToWin) {
       winningPlayerName = playerOneName ?? strings.player1;
       gameOver = true;
-      winningTeamNumber = teamsFromArgs.first.teamNumber;
+      winningTeam = teamsFromArgs.first;
     } else if (playerTwoWinCount == roundsToWin) {
       winningPlayerName = playerTwoName ?? strings.player2;
       gameOver = true;
-      winningTeamNumber = teamsFromArgs[1].teamNumber;
+      winningTeam = teamsFromArgs[1];
     }
 
     if (gameOver) {
       winnerVisible = true;
       canResetScores = false;
-      Provider.of<Winners>(context).winners.add(winningTeamNumber);
+      final winnersList = Provider.of<Winners>(context).winners;
+      if (!winnersList.contains(winningTeam)) {
+        winnersList.add(winningTeam);
+      }
     }
 
     print('GameOver = $gameOver');
