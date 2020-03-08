@@ -9,11 +9,14 @@ const String player2 = 'Player 2';
 const String forTheWin = 'FTW';
 const String wins = 'Wins: ';
 
-const String finish = 'FINISH';
+const String start = 'START';
 const String numberOfTeams = 'Number of Teams: ';
 const String numberOfRounds = 'Number of Rounds: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
+const String champions = 'Champions!';
+const String nextRound = 'Next Round';
+const String reset = 'Reset';
 
 const String versus = 'VS';
 String teamCardTitle(int ftwScore, int numberOfRounds) {

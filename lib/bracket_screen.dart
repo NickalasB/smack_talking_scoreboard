@@ -19,8 +19,8 @@ class BracketScreen extends StatefulWidget {
 
 class _BracketScreenState extends State<BracketScreen> {
   List<TeamCard> teamCards;
-  List<TeamCard> winners;
-  List<TeamCard> loserTeamCards;
+  List<TeamCard> winnerCards;
+  List<TeamCard> loserCards;
   bool readyForNextRound = false;
   bool goToNextRound = false;
   bool tournamentOver = false;
@@ -38,16 +38,15 @@ class _BracketScreenState extends State<BracketScreen> {
   @override
   void didChangeDependencies() {
     teamCards = ModalRoute.of(context).settings.arguments;
-    winners = Provider.of<Winners>(context).winners;
+    winnerCards = Provider.of<Winners>(context).winners;
 
-    loserTeamCards = winnersOfLastRound.isEmpty
-        ? teamCards.where((team) => !winners.contains(team)).toList()
-        : winnersOfLastRound.where((team) => !winners.contains(team)).toList();
+    loserCards = winnersOfLastRound.isEmpty
+        ? teamCards.where((team) => !winnerCards.contains(team)).toList()
+        : winnersOfLastRound
+            .where((team) => !winnerCards.contains(team))
+            .toList();
 
-    readyForNextRound = loserTeamCards.length == winners.length;
-
-    print('Losers = ${loserTeamCards.length}');
-    print('Winners = ${winners.length}');
+    readyForNextRound = loserCards.length == winnerCards.length;
 
     if (shouldShuffle.value) {
       teamCards.shuffle();
@@ -66,10 +65,8 @@ class _BracketScreenState extends State<BracketScreen> {
             ActionButton(
                 onPressedFunction: tournamentOver
                     ? () {
-                        tournamentOver = false;
                         goToNextRound = false;
-                        readyForNextRound = false;
-                        winners.clear();
+                        winnerCards.clear();
                         winnersOfLastRound.clear();
 
                         setState(() {});
@@ -77,16 +74,14 @@ class _BracketScreenState extends State<BracketScreen> {
                     : readyForNextRound
                         ? () {
                             winnersOfLastRound.clear();
-                            winnersOfLastRound.addAll(winners);
-                            winners.clear();
+                            winnersOfLastRound.addAll(winnerCards);
+                            winnerCards.clear();
                             goToNextRound = true;
-                            readyForNextRound = false;
-                            tournamentOver = false;
 
                             setState(() {});
                           }
                         : null,
-                label: !tournamentOver ? 'Next Round' : 'Reset')
+                label: !tournamentOver ? strings.nextRound : strings.reset)
           ]),
         ),
       ),
@@ -111,7 +106,7 @@ class _BracketScreenState extends State<BracketScreen> {
 
       widgetList.add(GestureDetector(
         onTap: () {
-          if (!noWinnerOrLoser(winners, firstTeam, secondTeam)) {
+          if (!noWinnerOrLoser(winnerCards, firstTeam, secondTeam)) {
             return null;
           }
           return Navigator.of(context).pushNamed(
@@ -137,7 +132,7 @@ class _BracketScreenState extends State<BracketScreen> {
                       child: Text(
                         !tournamentOver
                             ? strings.teamCardTitle(ftwScore, numberOfRounds)
-                            : 'Winner Winner Chicken Dinner!',
+                            : strings.champions,
                         style: TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
@@ -147,9 +142,9 @@ class _BracketScreenState extends State<BracketScreen> {
                   ),
                 ),
                 Opacity(
-                  opacity: winners.isEmpty ||
-                          winners.contains(firstTeam) ||
-                          noWinnerOrLoser(winners, firstTeam, secondTeam)
+                  opacity: winnerCards.isEmpty ||
+                          winnerCards.contains(firstTeam) ||
+                          noWinnerOrLoser(winnerCards, firstTeam, secondTeam)
                       ? 1.0
                       : .5,
                   child: IgnorePointer(ignoring: true, child: firstTeam),
@@ -162,9 +157,9 @@ class _BracketScreenState extends State<BracketScreen> {
                       )
                     : SizedBox.shrink(),
                 Opacity(
-                  opacity: winners.isEmpty ||
-                          winners.contains(secondTeam) ||
-                          noWinnerOrLoser(winners, firstTeam, secondTeam)
+                  opacity: winnerCards.isEmpty ||
+                          winnerCards.contains(secondTeam) ||
+                          noWinnerOrLoser(winnerCards, firstTeam, secondTeam)
                       ? 1.0
                       : .5,
                   child: IgnorePointer(

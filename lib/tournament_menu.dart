@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
+import 'package:smack_talking_scoreboard/ints.dart' as ints;
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
 import 'package:smack_talking_scoreboard/ui_components/components.dart';
@@ -62,7 +63,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                                 dropDownValue: teamCountValue,
                                 onChangedFunction: setTeamCountValue,
                                 items: getDropdownItems(
-                                    [2, 4, 6, 8, 10, 12, 14, 16, 32]),
+                                    ints.dropdownTeamCountOptions),
                               ),
                             ),
                             Expanded(
@@ -70,7 +71,8 @@ class TournamentMenuState extends State<TournamentMenu> {
                                 label: strings.numberOfRounds,
                                 dropDownValue: roundCountValue,
                                 onChangedFunction: setRoundsValue,
-                                items: getDropdownItems([1, 2, 3, 4, 5, 6]),
+                                items:
+                                    getDropdownItems(ints.dropdownRoundOptions),
                               ),
                             ),
                             Expanded(
@@ -78,29 +80,8 @@ class TournamentMenuState extends State<TournamentMenu> {
                                 label: 'Score For The Win:',
                                 dropDownValue: ftwValue,
                                 onChangedFunction: setFtwValue,
-                                items: getDropdownItems([
-                                  1,
-                                  2,
-                                  3,
-                                  4,
-                                  5,
-                                  6,
-                                  7,
-                                  8,
-                                  9,
-                                  10,
-                                  11,
-                                  12,
-                                  13,
-                                  14,
-                                  15,
-                                  16,
-                                  17,
-                                  18,
-                                  19,
-                                  20,
-                                  21,
-                                ]),
+                                items:
+                                    getDropdownItems(ints.dropdownScoreOptions),
                               ),
                             ),
                           ],
@@ -130,7 +111,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                     ],
                   ),
                 ),
-                _FinishButton(teamCards),
+                _StartTournamentButton(teamCards),
               ],
             );
           },
@@ -244,8 +225,8 @@ class TournamentDropdown extends StatelessWidget {
   }
 }
 
-class _FinishButton extends StatelessWidget {
-  const _FinishButton(this.teamCards);
+class _StartTournamentButton extends StatelessWidget {
+  const _StartTournamentButton(this.teamCards);
 
   final List<TeamCard> teamCards;
 
@@ -258,7 +239,7 @@ class _FinishButton extends StatelessWidget {
         Navigator.popAndPushNamed(context, BracketScreen.id,
             arguments: teamCards);
       },
-      label: strings.finish,
+      label: strings.start,
     );
   }
 }
