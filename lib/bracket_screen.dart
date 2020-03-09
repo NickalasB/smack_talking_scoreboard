@@ -106,7 +106,8 @@ class _BracketScreenState extends State<BracketScreen> {
 
       widgetList.add(GestureDetector(
         onTap: () {
-          if (!noWinnerOrLoser(winnerCards, firstTeam, secondTeam)) {
+          if (tournamentOver ||
+              !noWinnerOrLoser(winnerCards, firstTeam, secondTeam)) {
             return null;
           }
           return Navigator.of(context).pushNamed(
