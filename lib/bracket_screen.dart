@@ -6,8 +6,10 @@ import 'package:quiver/iterables.dart';
 import 'package:smack_talking_scoreboard/scoreboard.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/top_level_functions.dart';
 import 'package:smack_talking_scoreboard/ui_components/components.dart';
 
+import 'custom_will_pop_scope.dart';
 import 'models/winners.dart';
 
 class BracketScreen extends StatefulWidget {
@@ -57,32 +59,35 @@ class _BracketScreenState extends State<BracketScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(children: [
-            ..._buildBracketSeeds(teamCards, context),
-            ActionButton(
-                onPressedFunction: tournamentOver
-                    ? () {
-                        goToNextRound = false;
-                        winnerCards.clear();
-                        winnersOfLastRound.clear();
+    return CustomWillPopScope(
+      onWillPop: () => onBackPressed(context, strings.exitTournamentTitle),
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(children: [
+              ..._buildBracketSeeds(teamCards, context),
+              ActionButton(
+                  onPressedFunction: tournamentOver
+                      ? () {
+                          goToNextRound = false;
+                          winnerCards.clear();
+                          winnersOfLastRound.clear();
 
-                        setState(() {});
-                      }
-                    : readyForNextRound
-                        ? () {
-                            winnersOfLastRound.clear();
-                            winnersOfLastRound.addAll(winnerCards);
-                            winnerCards.clear();
-                            goToNextRound = true;
+                          setState(() {});
+                        }
+                      : readyForNextRound
+                          ? () {
+                              winnersOfLastRound.clear();
+                              winnersOfLastRound.addAll(winnerCards);
+                              winnerCards.clear();
+                              goToNextRound = true;
 
-                            setState(() {});
-                          }
-                        : null,
-                label: !tournamentOver ? strings.nextRound : strings.reset)
-          ]),
+                              setState(() {});
+                            }
+                          : null,
+                  label: !tournamentOver ? strings.nextRound : strings.reset)
+            ]),
+          ),
         ),
       ),
     );

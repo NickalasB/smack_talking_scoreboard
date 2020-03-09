@@ -18,6 +18,12 @@ const String champions = 'Champions!';
 const String nextRound = 'Next Round';
 const String reset = 'Reset';
 
+const String exitTournamentTitle = 'Exit Tournament?';
+const String exitGameTitle = 'Exit Game?';
+const String exitDialogContent = 'All current progress will be reset';
+const String exitDialogYes = 'YES';
+const String exitDialogNo = 'NO';
+
 const String versus = 'VS';
 String teamCardTitle(int ftwScore, int numberOfRounds) {
   final plural = numberOfRounds > 1;

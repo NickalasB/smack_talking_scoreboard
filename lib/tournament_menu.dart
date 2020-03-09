@@ -5,8 +5,10 @@ import 'package:smack_talking_scoreboard/bracket_screen.dart';
 import 'package:smack_talking_scoreboard/ints.dart' as ints;
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/top_level_functions.dart';
 import 'package:smack_talking_scoreboard/ui_components/components.dart';
 
+import 'custom_will_pop_scope.dart';
 import 'models/winners.dart';
 
 class TournamentMenu extends StatefulWidget {
@@ -36,85 +38,88 @@ class TournamentMenuState extends State<TournamentMenu> {
         ftwScore: ftwValue,
       );
     });
-    return SafeArea(
+    return CustomWillPopScope(
+      onWillPop: () => onBackPressed(context, strings.exitTournamentTitle),
       child: Scaffold(
         backgroundColor: Colors.grey[300],
-        body: OrientationBuilder(
-          builder: (context, _) {
-            final isLandscape =
-                MediaQuery.of(context).orientation == Orientation.landscape;
+        body: SafeArea(
+          child: OrientationBuilder(
+            builder: (context, _) {
+              final isLandscape =
+                  MediaQuery.of(context).orientation == Orientation.landscape;
 
-            return Column(
-              children: <Widget>[
-                _TournamentTitle(),
-                Expanded(
-                  child: Stack(
-                    children: <Widget>[
-                      FractionallySizedBox(
-                        widthFactor: isLandscape ? .5 : 1,
-                        heightFactor: isLandscape ? 1 : .33,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Expanded(
-                              child: TournamentDropdown(
-                                label: strings.numberOfTeams,
-                                dropDownValue: teamCountValue,
-                                onChangedFunction: setTeamCountValue,
-                                items: getDropdownItems(
-                                    ints.dropdownTeamCountOptions),
+              return Column(
+                children: <Widget>[
+                  _TournamentTitle(),
+                  Expanded(
+                    child: Stack(
+                      children: <Widget>[
+                        FractionallySizedBox(
+                          widthFactor: isLandscape ? .5 : 1,
+                          heightFactor: isLandscape ? 1 : .33,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                child: TournamentDropdown(
+                                  label: strings.numberOfTeams,
+                                  dropDownValue: teamCountValue,
+                                  onChangedFunction: setTeamCountValue,
+                                  items: getDropdownItems(
+                                      ints.dropdownTeamCountOptions),
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: TournamentDropdown(
-                                label: strings.numberOfRounds,
-                                dropDownValue: roundCountValue,
-                                onChangedFunction: setRoundsValue,
-                                items:
-                                    getDropdownItems(ints.dropdownRoundOptions),
+                              Expanded(
+                                child: TournamentDropdown(
+                                  label: strings.numberOfRounds,
+                                  dropDownValue: roundCountValue,
+                                  onChangedFunction: setRoundsValue,
+                                  items: getDropdownItems(
+                                      ints.dropdownRoundOptions),
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: TournamentDropdown(
-                                label: 'Score For The Win:',
-                                dropDownValue: ftwValue,
-                                onChangedFunction: setFtwValue,
-                                items:
-                                    getDropdownItems(ints.dropdownScoreOptions),
+                              Expanded(
+                                child: TournamentDropdown(
+                                  label: 'Score For The Win:',
+                                  dropDownValue: ftwValue,
+                                  onChangedFunction: setFtwValue,
+                                  items: getDropdownItems(
+                                      ints.dropdownScoreOptions),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Stack(
-                          children: <Widget>[
-                            Align(
-                              alignment: isLandscape
-                                  ? Alignment.centerRight
-                                  : Alignment.bottomCenter,
-                              child: FractionallySizedBox(
-                                widthFactor: isLandscape ? .50 : 1,
-                                heightFactor: isLandscape ? 1 : .66,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: teamCards,
+                        Padding(
+                          padding: EdgeInsets.only(top: 16),
+                          child: Stack(
+                            children: <Widget>[
+                              Align(
+                                alignment: isLandscape
+                                    ? Alignment.centerRight
+                                    : Alignment.bottomCenter,
+                                child: FractionallySizedBox(
+                                  widthFactor: isLandscape ? .50 : 1,
+                                  heightFactor: isLandscape ? 1 : .66,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: teamCards,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                _StartTournamentButton(teamCards),
-              ],
-            );
-          },
+                  _StartTournamentButton(teamCards),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -165,7 +170,7 @@ class _TournamentTitle extends StatelessWidget {
         decoration: InputDecoration(hintText: strings.tournamentName),
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 64,
+          fontSize: 32,
         ),
         textAlign: TextAlign.center,
       ),
