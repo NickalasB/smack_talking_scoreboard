@@ -306,7 +306,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
                     child: FittedBox(
                       child: Text(
                         strings.winningPlayerName(winningPlayerName),
-                        style: TextStyle(fontSize: 300),
+                        style: TextStyle(
+                            fontSize: 300, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
