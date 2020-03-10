@@ -24,6 +24,7 @@ class TournamentMenuState extends State<TournamentMenu> {
   int teamCountValue = 2;
   int roundCountValue = 1;
   int ftwValue = 7;
+  String tournamentName;
 
   List<TeamCard> teamCards;
 
@@ -41,7 +42,7 @@ class TournamentMenuState extends State<TournamentMenu> {
     return CustomWillPopScope(
       onWillPop: () => onBackPressed(context, strings.exitTournamentTitle),
       child: Scaffold(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: Colors.grey[200],
         body: SafeArea(
           child: OrientationBuilder(
             builder: (context, _) {
@@ -50,7 +51,22 @@ class TournamentMenuState extends State<TournamentMenu> {
 
               return Column(
                 children: <Widget>[
-                  _TournamentTitle(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      maxLines: null,
+                      showCursor: true,
+                      textCapitalization: TextCapitalization.words,
+                      onChanged: (text) => tournamentName = text,
+                      decoration:
+                          InputDecoration(hintText: strings.tournamentName),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                   Expanded(
                     child: Stack(
                       children: <Widget>[
@@ -115,7 +131,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                       ],
                     ),
                   ),
-                  _StartTournamentButton(teamCards),
+                  _StartTournamentButton(tournamentName, teamCards),
                 ],
               );
             },
@@ -152,29 +168,6 @@ class TournamentMenuState extends State<TournamentMenu> {
         ),
       );
     }).toList();
-  }
-}
-
-class _TournamentTitle extends StatelessWidget {
-  const _TournamentTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        maxLines: null,
-        showCursor: true,
-        textCapitalization: TextCapitalization.words,
-        onChanged: null,
-        decoration: InputDecoration(hintText: strings.tournamentName),
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 32,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
   }
 }
 
@@ -231,9 +224,10 @@ class TournamentDropdown extends StatelessWidget {
 }
 
 class _StartTournamentButton extends StatelessWidget {
-  const _StartTournamentButton(this.teamCards);
+  const _StartTournamentButton(this.tournamentName, this.teamCards);
 
   final List<TeamCard> teamCards;
+  final String tournamentName;
 
   @override
   Widget build(BuildContext context) {
@@ -242,7 +236,7 @@ class _StartTournamentButton extends StatelessWidget {
         Provider.of<Winners>(context, listen: false).winners?.clear();
 
         Navigator.popAndPushNamed(context, BracketScreen.id,
-            arguments: teamCards);
+            arguments: [tournamentName, teamCards]);
       },
       label: strings.start,
     );

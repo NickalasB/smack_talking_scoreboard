@@ -23,6 +23,7 @@ class _BracketScreenState extends State<BracketScreen> {
   List<TeamCard> teamCards;
   List<TeamCard> winnerCards;
   List<TeamCard> loserCards;
+  List<dynamic> arguments;
   bool readyForNextRound = false;
   bool goToNextRound = false;
   bool tournamentOver = false;
@@ -39,7 +40,9 @@ class _BracketScreenState extends State<BracketScreen> {
 
   @override
   void didChangeDependencies() {
-    teamCards = ModalRoute.of(context).settings.arguments;
+    arguments = ModalRoute.of(context).settings.arguments;
+    teamCards = arguments[1];
+
     winnerCards = Provider.of<Winners>(context).winners;
 
     loserCards = winnersOfLastRound.isEmpty
@@ -62,6 +65,7 @@ class _BracketScreenState extends State<BracketScreen> {
     return CustomWillPopScope(
       onWillPop: () => onBackPressed(context, strings.exitTournamentTitle),
       child: Scaffold(
+        backgroundColor: Colors.grey[200],
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(children: [
@@ -138,7 +142,7 @@ class _BracketScreenState extends State<BracketScreen> {
                       child: Text(
                         !tournamentOver
                             ? strings.teamCardTitle(ftwScore, numberOfRounds)
-                            : strings.champions,
+                            : strings.champions(arguments.first),
                         style: TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,

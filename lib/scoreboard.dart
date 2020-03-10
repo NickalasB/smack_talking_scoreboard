@@ -251,6 +251,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     print('GameOver = $gameOver');
 
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: OrientationBuilder(
           builder: (context, _) {
