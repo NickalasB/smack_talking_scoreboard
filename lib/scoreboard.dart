@@ -28,6 +28,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   List<TeamCard> teamsFromArgs;
 
+  bool isSingleGame;
+
   double volume = 1.0;
 
   String playerOneName;
@@ -91,7 +93,9 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   didChangeDependencies() {
     arguments = ModalRoute.of(context).settings.arguments;
 
-    if (arguments != null) {
+    isSingleGame = arguments == null;
+
+    if (!isSingleGame) {
       teamsFromArgs = arguments?.expand((i) => i)?.toList();
 
       final team1 = teamsFromArgs.first;
@@ -351,6 +355,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       winCount: playerOneWinCount,
       roundsToWin: roundsToWin,
       playerName: playerOneName,
+      isSingleGame: isSingleGame,
     );
   }
 
@@ -382,6 +387,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       winCount: playerTwoWinCount,
       roundsToWin: roundsToWin,
       playerName: playerTwoName,
+      isSingleGame: isSingleGame,
     );
   }
 
@@ -531,7 +537,8 @@ class Player extends StatelessWidget {
       this.textEditingController,
       @required this.winCount,
       @required this.roundsToWin,
-      this.playerName});
+      this.playerName,
+      @required this.isSingleGame});
 
   final Function scoreDragFunction;
   final Function longPressFunction;
@@ -547,6 +554,7 @@ class Player extends StatelessWidget {
   final int winCount;
   final int roundsToWin;
   final String playerName;
+  final bool isSingleGame;
 
   @override
   Widget build(BuildContext context) {
@@ -564,6 +572,7 @@ class Player extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextField(
+              enabled: isSingleGame,
               showCursor: true,
               textCapitalization: TextCapitalization.words,
               cursorColor: cursorColor,
