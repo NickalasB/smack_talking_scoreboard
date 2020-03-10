@@ -14,7 +14,7 @@ const String numberOfTeams = 'Number of Teams: ';
 const String numberOfRounds = 'Number of Rounds: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
-String champions(String tournamentName) => '${tournamentName ?? ''}Champions!';
+String champions(String tournamentName) => '${tournamentName ?? ''} Champions!';
 const String nextRound = 'Next Round';
 const String reset = 'Reset';
 
