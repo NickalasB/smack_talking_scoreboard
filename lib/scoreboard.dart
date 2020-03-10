@@ -2,7 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/top_level_functions.dart';
+
+import 'models/winners.dart';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -18,13 +23,26 @@ enum TtsState { PLAYING, STOPPED }
 class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   FlutterTts flutterTts;
   dynamic languages;
-  double volume = 0.5;
 
-  String playerOneName = strings.player1;
+  List<List<TeamCard>> arguments;
 
-  String playerTwoName = strings.player2;
+  List<TeamCard> teamsFromArgs;
+
+  bool isSingleGame;
+
+  double volume = 1.0;
+
+  String playerOneName;
+
+  String playerTwoName;
 
   int scoreToWin;
+
+  int roundsToWin;
+
+  bool winnerVisible = false;
+
+  bool canResetScores = true;
 
   int playerOneScore = 0;
 
@@ -56,7 +74,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   initState() {
-    super.initState();
     initTts();
 
     animationController =
@@ -69,9 +86,60 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     animation2 =
         CurvedAnimation(parent: animationController2, curve: Curves.easeIn);
 
-    player1TextEditingController = TextEditingController();
-    player2TextEditingController = TextEditingController();
-    ftwTextEditingController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  didChangeDependencies() {
+    arguments = ModalRoute.of(context).settings.arguments;
+
+    isSingleGame = arguments == null;
+
+    if (!isSingleGame) {
+      teamsFromArgs = arguments?.expand((i) => i)?.toList();
+
+      final team1 = teamsFromArgs.first;
+      final team2 = teamsFromArgs[1];
+
+      roundsToWin = team1.numOfRounds;
+
+      scoreToWin = team1.ftwScore;
+
+      final teamOneFirstName = team1.controller1.text;
+      final teamOneSecondName = team1.controller2.text;
+
+      final teamTwoFirstName = team2.controller1.text;
+      final teamTwoSecondName = team2.controller2.text;
+
+      if (teamOneFirstName?.isNotEmpty == true &&
+          teamOneSecondName?.isNotEmpty == true) {
+        playerOneName = '$teamOneFirstName & $teamOneSecondName';
+      } else if (teamOneSecondName?.isEmpty == true &&
+          teamOneFirstName?.isEmpty != true) {
+        playerOneName = teamOneFirstName;
+      } else if (teamTwoFirstName?.isEmpty == true &&
+          teamOneSecondName?.isEmpty != true) {
+        playerOneName = teamOneSecondName;
+      }
+
+      if (teamTwoFirstName?.isNotEmpty == true &&
+          teamTwoSecondName?.isNotEmpty == true) {
+        playerTwoName = '$teamTwoFirstName & $teamTwoSecondName';
+      } else if (teamTwoSecondName?.isEmpty == true &&
+          teamTwoFirstName?.isEmpty != true) {
+        playerTwoName = teamOneFirstName;
+      } else if (teamOneFirstName?.isEmpty == true &&
+          teamTwoSecondName?.isEmpty != true) {
+        playerTwoName = teamTwoSecondName;
+      }
+    }
+
+    player1TextEditingController = TextEditingController(text: playerOneName);
+    player2TextEditingController = TextEditingController(text: playerTwoName);
+    ftwTextEditingController =
+        TextEditingController(text: scoreToWin?.toString());
+
+    super.didChangeDependencies();
   }
 
   initTts() {
@@ -106,10 +174,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     String playerToInsult = '';
     List<String> insultList = [];
     if (playerOneScore < playerTwoScore) {
-      playerToInsult = playerOneName;
+      playerToInsult = playerOneName ?? strings.player1;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore > playerTwoScore) {
-      playerToInsult = playerTwoName;
+      playerToInsult = playerTwoName ?? strings.player2;
       insultList = strings.standardInsults(playerToInsult);
     } else if (playerOneScore == playerTwoScore) {
       insultList = strings.tieGameInsults();
@@ -136,15 +204,11 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void _onChangePlayerOne(String text) {
-    setState(() {
-      playerOneName = text.isNotEmpty ? text : strings.player1;
-    });
+    playerOneName = text;
   }
 
   void _onChangePlayerTwo(String text) {
-    setState(() {
-      playerTwoName = text.isNotEmpty ? text : strings.player2;
-    });
+    playerTwoName = text;
   }
 
   void updateScoreToWin(String text) {
@@ -157,59 +221,105 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     bool playerOneWins = false;
     bool playerTwoWins = false;
+    bool gameOver = false;
+    String winningPlayerName;
+    TeamCard winningTeam;
     if (scoreToWin != null) {
       playerOneWins = playerOneScore > 0 && playerOneScore >= scoreToWin;
       playerTwoWins = playerTwoScore > 0 && playerTwoScore >= scoreToWin;
     }
 
-    return SafeArea(
-      child: Scaffold(
-        body: OrientationBuilder(
+    if (playerOneWinCount == roundsToWin) {
+      winningPlayerName = playerOneName ?? strings.player1;
+      gameOver = true;
+      winningTeam = teamsFromArgs.first;
+    } else if (playerTwoWinCount == roundsToWin) {
+      winningPlayerName = playerTwoName ?? strings.player2;
+      gameOver = true;
+      winningTeam = teamsFromArgs[1];
+    }
+
+    if (gameOver) {
+      winnerVisible = true;
+      canResetScores = false;
+      final winnersList = Provider.of<Winners>(context).winners;
+      if (!winnersList.contains(winningTeam)) {
+        winnersList.add(winningTeam);
+      }
+    }
+
+    print('GameOver = $gameOver');
+
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      body: SafeArea(
+        child: OrientationBuilder(
           builder: (context, _) {
-            return MediaQuery.of(context).orientation == Orientation.landscape
-                ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(children: [
-                      Expanded(
-                        child: buildPlayer1(),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          buildFtwField(),
-                          buildPlayerTurnButton(playerOneWins, playerTwoWins),
-                          buildVolumeButton(),
-                        ],
-                      ),
-                      Expanded(
-                        child: buildPlayer2(),
-                      ),
-                    ]),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 24),
-                        Expanded(
-                          child: buildPlayer1(),
-                        ),
-                        SizedBox(height: 24),
-                        Expanded(
-                          child: buildPlayer2(),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            return Stack(
+              children: <Widget>[
+                MediaQuery.of(context).orientation == Orientation.landscape
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
                           children: [
-                            buildFtwField(),
-                            buildPlayerTurnButton(playerOneWins, playerTwoWins),
-                            buildVolumeButton(),
+                            Expanded(
+                              child: buildPlayer1(),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                buildFtwField(),
+                                buildPlayerTurnButton(
+                                    playerOneWins, playerTwoWins),
+                                buildVolumeButton(),
+                              ],
+                            ),
+                            Expanded(
+                              child: buildPlayer2(),
+                            ),
                           ],
                         ),
-                      ],
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 24),
+                            Expanded(
+                              child: buildPlayer1(),
+                            ),
+                            SizedBox(height: 24),
+                            Expanded(
+                              child: buildPlayer2(),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                buildFtwField(),
+                                buildPlayerTurnButton(
+                                    playerOneWins, playerTwoWins),
+                                buildVolumeButton(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                Visibility(
+                  visible: winnerVisible,
+                  child: Center(
+                    child: FittedBox(
+                      child: Text(
+                        strings.winningPlayerName(winningPlayerName),
+                        style: TextStyle(
+                            fontSize: 300, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  );
+                  ),
+                ),
+              ],
+            );
           },
         ),
       ),
@@ -217,6 +327,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   Widget buildPlayer1() {
+    Color teamFromArgsColor;
+    Color teamFromArgsCursorColor;
+    if (teamsFromArgs != null) {
+      teamFromArgsColor =
+          generateProperTeamColor(teamsFromArgs.first.teamNumber);
+      teamFromArgsCursorColor =
+          generateProperHintColor(teamsFromArgs.first.teamNumber);
+    }
+
     return Player(
       scoreDragFunction: adjustPlayerOneScore,
       longPressFunction: resetScores,
@@ -226,16 +345,30 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       },
       nameFunction: _onChangePlayerOne,
       score: playerOneScore,
-      color: Colors.red,
+      color: teamFromArgsColor == null ? Colors.red : teamFromArgsColor,
+      cursorColor: teamFromArgsColor == null
+          ? Colors.grey[400]
+          : teamFromArgsCursorColor,
       hint: (strings.player1),
       opacity: playerOneOpacity,
       animation: animation,
       textEditingController: player1TextEditingController,
       winCount: playerOneWinCount,
+      roundsToWin: roundsToWin,
+      playerName: playerOneName,
+      isSingleGame: isSingleGame,
     );
   }
 
   Widget buildPlayer2() {
+    Color teamFromArgsColor;
+    Color teamFromArgsCursorColor;
+
+    if (teamsFromArgs != null) {
+      teamFromArgsColor = generateProperTeamColor(teamsFromArgs[1].teamNumber);
+      teamFromArgsCursorColor =
+          generateProperHintColor(teamsFromArgs[1].teamNumber);
+    }
     return Player(
       scoreDragFunction: adjustPlayerTwoScore,
       longPressFunction: resetScores,
@@ -245,12 +378,17 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       },
       nameFunction: _onChangePlayerTwo,
       score: playerTwoScore,
-      color: Colors.blue,
+      color: teamFromArgsColor == null ? Colors.blue : teamFromArgsColor,
+      cursorColor:
+          teamFromArgsColor == null ? Colors.black45 : teamFromArgsCursorColor,
       hint: (strings.player2),
       opacity: playerTwoOpacity,
       animation: animation2,
       textEditingController: player2TextEditingController,
       winCount: playerTwoWinCount,
+      roundsToWin: roundsToWin,
+      playerName: playerTwoName,
+      isSingleGame: isSingleGame,
     );
   }
 
@@ -373,17 +511,19 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void resetScores() {
-    setState(() {
-      playerTwoScore = 0;
-      playerOneOpacity = 1.0;
-      playerOneScore = 0;
-      playerTwoOpacity = 1.0;
-      playerTurnButtonEnabled = true;
-    });
+    if (canResetScores) {
+      setState(() {
+        playerTwoScore = 0;
+        playerOneOpacity = 1.0;
+        playerOneScore = 0;
+        playerTwoOpacity = 1.0;
+        playerTurnButtonEnabled = true;
+      });
+    }
   }
 }
 
-class Player extends StatefulWidget {
+class Player extends StatelessWidget {
   const Player(
       {@required this.scoreDragFunction,
       @required this.longPressFunction,
@@ -391,11 +531,15 @@ class Player extends StatefulWidget {
       @required this.nameFunction,
       @required this.score,
       @required this.color,
+      @required this.cursorColor,
       @required this.hint,
       @required this.opacity,
       @required this.animation,
-      @required this.textEditingController,
-      @required this.winCount});
+      this.textEditingController,
+      @required this.winCount,
+      @required this.roundsToWin,
+      this.playerName,
+      @required this.isSingleGame});
 
   final Function scoreDragFunction;
   final Function longPressFunction;
@@ -403,26 +547,25 @@ class Player extends StatefulWidget {
   final Function nameFunction;
   final int score;
   final Color color;
+  final Color cursorColor;
   final String hint;
   final double opacity;
   final Animation animation;
   final TextEditingController textEditingController;
   final int winCount;
+  final int roundsToWin;
+  final String playerName;
+  final bool isSingleGame;
 
-  @override
-  _PlayerState createState() => _PlayerState();
-}
-
-class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.opacity == 1.0;
+    final enabled = opacity == 1.0;
     return Column(
       children: <Widget>[
         Container(
           alignment: Alignment.topCenter,
           decoration: BoxDecoration(
-            color: widget.color,
+            color: color,
             borderRadius: BorderRadius.all(
               Radius.circular(8),
             ),
@@ -430,15 +573,18 @@ class _PlayerState extends State<Player> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextField(
+              enabled: isSingleGame,
               showCursor: true,
               textCapitalization: TextCapitalization.words,
-              onChanged: widget.nameFunction,
-              decoration: InputDecoration(hintText: widget.hint),
+              cursorColor: cursorColor,
+              onChanged: nameFunction,
+              decoration: InputDecoration(hintText: hint),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 32,
+                color: Colors.grey[200],
               ),
-              controller: widget.textEditingController,
+              controller: textEditingController,
             ),
           ),
         ),
@@ -447,25 +593,25 @@ class _PlayerState extends State<Player> {
           child: Stack(
             children: <Widget>[
               Opacity(
-                opacity: widget.opacity,
+                opacity: opacity,
                 child: GestureDetector(
                   onVerticalDragEnd: (details) {
-                    if (enabled) widget.scoreDragFunction(details);
+                    if (enabled) scoreDragFunction(details);
                   },
-                  onLongPress: widget.longPressFunction,
-                  onTap: enabled ? widget.singleTapFunction : null,
+                  onLongPress: longPressFunction,
+                  onTap: enabled ? singleTapFunction : null,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: widget.color,
+                      color: color,
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     width: double.infinity,
                     height: double.infinity,
                     child: RotationTransition(
-                      turns: widget.animation,
+                      turns: animation,
                       child: FittedBox(
                         child: Text(
-                          widget.score.toString(),
+                          score.toString(),
                           style: TextStyle(
                             color: Colors.grey[200],
                             fontSize: 220,
@@ -484,14 +630,24 @@ class _PlayerState extends State<Player> {
                     children: [
                       Text(
                         strings.wins,
-                        style: TextStyle(color: Colors.grey[200], fontSize: 24),
+                        style: TextStyle(
+                            color: Colors.grey[200],
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold),
                       ),
                       RotationTransition(
-                        turns: widget.animation,
+                        turns: animation,
                         child: Text(
-                          widget.winCount.toString(),
-                          style:
-                              TextStyle(color: Colors.grey[200], fontSize: 24),
+                          roundsToWin != null
+                              ? strings.winCountVsRoundCount(
+                                  winCount: winCount.toString(),
+                                  roundsToWin: roundsToWin.toString(),
+                                )
+                              : winCount.toString(),
+                          style: TextStyle(
+                              color: Colors.grey[200],
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

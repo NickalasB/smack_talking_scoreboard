@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 const String mainMenuTitle = 'SMACK TALKING SCOREBOARD';
 const String singleGameLabel = 'Single Game';
 const String tournamentLabel = 'Tournament';
@@ -7,11 +9,34 @@ const String player2 = 'Player 2';
 const String forTheWin = 'FTW';
 const String wins = 'Wins: ';
 
-const String finish = 'FINISH';
+const String start = 'START';
 const String numberOfTeams = 'Number of Teams: ';
 const String numberOfRounds = 'Number of Rounds: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
+String champions(String tournamentName) => '${tournamentName ?? ''} Champions!';
+const String nextRound = 'Next Round';
+const String reset = 'Reset';
+
+const String exitTournamentTitle = 'Exit Tournament?';
+const String exitGameTitle = 'Exit Game?';
+const String exitDialogContent = 'All current progress will be reset';
+const String exitDialogYes = 'YES';
+const String exitDialogNo = 'NO';
+
+const String versus = 'VS';
+String teamCardTitle(int ftwScore, int numberOfRounds) {
+  final plural = numberOfRounds > 1;
+  return 'First to ${ftwScore.toString()}: ${numberOfRounds.toString()} ${plural ? 'Rounds' : 'Round'}';
+}
+
+String winCountVsRoundCount(
+        {@required String winCount, @required String roundsToWin}) =>
+    '$winCount out of $roundsToWin';
+
+String winningPlayerName(String playerName) => playerName?.contains('&') == true
+    ? '$playerName win!'
+    : '$playerName wins!';
 
 List<String> standardInsults(String playerToInsult) {
   List<String> insultList = [

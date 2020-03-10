@@ -1,24 +1,35 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/top_level_functions.dart';
 
 class TeamCard extends StatelessWidget {
-  const TeamCard(this.teamNumber);
+  const TeamCard(
+      {@required this.teamNumber,
+      @required this.controller1,
+      this.controller2,
+      @required this.numOfRounds,
+      @required this.ftwScore,
+      this.fromSingleGame = true});
 
   final int teamNumber;
+  final TextEditingController controller1;
+  final TextEditingController controller2;
+  final int numOfRounds;
+  final int ftwScore;
+  final bool fromSingleGame;
 
   @override
   Widget build(BuildContext context) {
-    bool evenTeamNumber = teamNumber % 2 == 0;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         children: <Widget>[
+          SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: evenTeamNumber ? Colors.blue : Colors.red),
+                color: generateProperTeamColor(teamNumber)),
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               children: <Widget>[
@@ -31,14 +42,14 @@ class TeamCard extends StatelessWidget {
                     color: Colors.grey[200],
                   ),
                 ),
-                TeamCardTextField(evenTeamNumber, strings.player1),
+                TeamCardTextField(teamNumber, strings.player1, controller1),
                 SizedBox(height: 24),
-                TeamCardTextField(evenTeamNumber, strings.player2),
+                TeamCardTextField(teamNumber, strings.player2, controller2),
                 SizedBox(height: 24)
               ],
             ),
           ),
-          SizedBox(height: 24)
+          SizedBox(height: 12)
         ],
       ),
     );
@@ -46,22 +57,24 @@ class TeamCard extends StatelessWidget {
 }
 
 class TeamCardTextField extends StatelessWidget {
-  const TeamCardTextField(this.evenTeamNumber, this.hint);
+  const TeamCardTextField(this.teamNumber, this.hint, this.controller);
 
-  final bool evenTeamNumber;
+  final int teamNumber;
   final String hint;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return TextField(
+      cursorColor: generateProperHintColor(teamNumber),
       showCursor: true,
       textCapitalization: TextCapitalization.words,
-      onChanged: null,
+      onChanged: (text) {},
+      controller: controller,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: evenTeamNumber ? Colors.grey[400] : Colors.black45,
+          color: generateProperHintColor(teamNumber),
         ),
       ),
       style: TextStyle(

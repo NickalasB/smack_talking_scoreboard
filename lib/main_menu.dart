@@ -17,7 +17,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.grey[200],
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
@@ -70,13 +70,15 @@ class GameButton extends StatelessWidget {
       child: RaisedButton(
         onPressed: () => Navigator.pushNamed(context, routeId),
         elevation: 4,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 64,
-            color: Colors.grey[200],
+        child: FittedBox(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 64,
+              color: Colors.grey[200],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         color: color,
       ),
