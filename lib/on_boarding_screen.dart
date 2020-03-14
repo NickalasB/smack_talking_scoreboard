@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smack_talking_scoreboard/main_menu_screen.dart';
 import 'package:smack_talking_scoreboard/ui_components/ftw_button.dart';
 import 'package:smack_talking_scoreboard/ui_components/player.dart';
@@ -11,7 +12,9 @@ import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 class OnBoardingScreen extends StatefulWidget {
   static const String id = 'on_boarding';
 
-  const OnBoardingScreen();
+  const OnBoardingScreen(this.prefs);
+
+  final SharedPreferences prefs;
 
   @override
   _OnBoardingScreenState createState() => _OnBoardingScreenState();
@@ -20,9 +23,7 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen>
     with TickerProviderStateMixin {
   Animation animation;
-
   AnimationController animationController;
-
   int playerOneScore = 0;
 
   @override
@@ -36,30 +37,40 @@ class _OnBoardingScreenState extends State<OnBoardingScreen>
   }
 
   @override
+  void dispose() async {
+    animationController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final subtitleStyle = Theme.of(context).textTheme.subtitle;
-    return Scaffold(
-      body: SafeArea(
-        child: IntroductionScreen(
-          pages: listPagesViewModel(),
-          onDone: () {
-            navigateToMainMenu(context);
-          },
-          showSkipButton: true,
-          onSkip: () async {
-            navigateToMainMenu(context);
-          },
-          skip: Text(
-            strings.skip,
-            style: subtitleStyle,
-          ),
-          done: Text(
-            strings.done,
-            style: subtitleStyle,
-          ),
-        ),
+    return IntroductionScreen(
+      globalBackgroundColor: Colors.grey[200],
+      pages: listPagesViewModel(),
+      onDone: () async {
+        setHasSeenOnBoardingScreen(widget.prefs)
+            .then((_) => navigateToMainMenu(context));
+      },
+      showSkipButton: true,
+      onSkip: () async {
+        setHasSeenOnBoardingScreen(widget.prefs)
+            .then((_) => navigateToMainMenu(context));
+      },
+      skip: Text(
+        strings.skip,
+        style: subtitleStyle,
+      ),
+      done: Text(
+        strings.done,
+        style: subtitleStyle,
       ),
     );
+  }
+
+  Future setHasSeenOnBoardingScreen(SharedPreferences prefs) async {
+    await prefs.setBool('has_seen_onBoarding', true);
   }
 
   Future<Object> navigateToMainMenu(BuildContext context) =>
@@ -217,7 +228,13 @@ class OnBoardingButtonColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [button, Text(text)];
+    List<Widget> children = [
+      button,
+      Text(
+        text,
+        style: Theme.of(context).textTheme.subtitle,
+      )
+    ];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 const String skip = 'Skip';
 const String done = 'Done';
+const String loadingText = 'One sec';
+
 const String onBoardPage1Title = 'The Scoreboard...';
 const String onBoardPage1Bullet1 = '• TAP or SWIPE UP to increase the score';
 const String onBoardPage1Bullet2 = '• SWIPE DOWN to decrease the score';
