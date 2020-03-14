@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
-import 'package:smack_talking_scoreboard/top_level_functions.dart';
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 
 import 'models/winners.dart';
 

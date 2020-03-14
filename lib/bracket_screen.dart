@@ -3,14 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
-import 'package:smack_talking_scoreboard/scoreboard.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/team_card.dart';
-import 'package:smack_talking_scoreboard/top_level_functions.dart';
 import 'package:smack_talking_scoreboard/ui_components/components.dart';
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 
-import 'custom_will_pop_scope.dart';
 import 'models/winners.dart';
+import 'utils/custom_will_pop_scope.dart';
 
 class BracketScreen extends StatefulWidget {
   static const String id = 'bracketScreen';

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smack_talking_scoreboard/scoreboard.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
-import 'package:smack_talking_scoreboard/tournament_menu.dart';
+import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
+import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
 class MainMenuScreen extends StatefulWidget {
   static const String id = 'main_menu';

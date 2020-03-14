@@ -12,6 +12,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   flutter_tts: ^0.8.6
   provider: ^4.0.4
+  introduction_screen: ^1.0.8
 
 dev_dependencies:
   flutter_test:
