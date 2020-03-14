@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
 import 'package:smack_talking_scoreboard/team_card.dart';
-import 'package:smack_talking_scoreboard/ui_components/components.dart';
+import 'package:smack_talking_scoreboard/ui_components/action_button.dart';
 import 'package:smack_talking_scoreboard/utils/ints.dart' as ints;
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';

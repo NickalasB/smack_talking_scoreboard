@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
+import 'package:smack_talking_scoreboard/on_boarding_screen.dart';
 import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
 
@@ -15,8 +16,9 @@ class SmackTalkingScoreboard extends StatelessWidget {
     return Provider(
       create: (_) => Winners(),
       child: MaterialApp(
-        initialRoute: MainMenuScreen.id,
+        initialRoute: OnBoardingScreen.id,
         routes: {
+          OnBoardingScreen.id: (context) => const OnBoardingScreen(),
           MainMenuScreen.id: (context) => const MainMenuScreen(),
           Scoreboard.id: (context) => const Scoreboard(),
           TournamentMenu.id: (context) => const TournamentMenu(),
