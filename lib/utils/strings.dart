@@ -36,6 +36,7 @@ const String wins = 'Wins: ';
 const String start = 'START';
 const String numberOfTeams = 'Number of Teams: ';
 const String numberOfRounds = 'Number of Rounds: ';
+const String scoreForTheWin = 'Score For The Win: ';
 const String tournamentName = 'Tournament Name';
 const String teamNumber = 'Team #';
 String champions(String tournamentName) => '${tournamentName ?? ''} Champions!';

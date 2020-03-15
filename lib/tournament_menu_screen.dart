@@ -75,7 +75,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                           heightFactor: isLandscape ? 1 : .33,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               Expanded(
                                 child: TournamentDropdown(
@@ -97,7 +97,7 @@ class TournamentMenuState extends State<TournamentMenu> {
                               ),
                               Expanded(
                                 child: TournamentDropdown(
-                                  label: 'Score For The Win:',
+                                  label: strings.scoreForTheWin,
                                   dropDownValue: ftwValue,
                                   onChangedFunction: setFtwValue,
                                   items: getDropdownItems(
@@ -186,37 +186,39 @@ class TournamentDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 68),
-            ),
-            Container(
-              height: 72,
-              child: DropdownButton<dynamic>(
-                value: dropDownValue,
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 64,
-                elevation: 16,
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
-                underline: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 2,
-                    color: Colors.blue,
-                  ),
-                ),
-                onChanged: onChangedFunction,
-                items: this.items,
+    return Container(
+      child: FittedBox(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 68),
               ),
-            ),
-          ],
+              Container(
+                height: 72,
+                child: DropdownButton<dynamic>(
+                  value: dropDownValue,
+                  icon: Icon(Icons.arrow_downward),
+                  iconSize: 64,
+                  elevation: 16,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.blue),
+                  underline: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      height: 2,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  onChanged: onChangedFunction,
+                  items: this.items,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
