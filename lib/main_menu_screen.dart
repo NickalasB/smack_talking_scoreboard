@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smack_talking_scoreboard/on_boarding_screen.dart';
 import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
+import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
@@ -23,6 +25,12 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   void initState() {
     super.initState();
     checkHasSeenOnBoarding();
+  }
+
+  @override
+  void didChangeDependencies() {
+    Provider.of<TextToSpeech>(context).initTts();
+    super.didChangeDependencies();
   }
 
   Future<bool> checkHasSeenOnBoarding() async {

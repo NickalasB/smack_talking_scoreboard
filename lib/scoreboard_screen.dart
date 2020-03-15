@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/team_card.dart';
+import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/ui_components/ftw_button.dart';
 import 'package:smack_talking_scoreboard/ui_components/player.dart';
 import 'package:smack_talking_scoreboard/ui_components/speak_button.dart';
@@ -21,19 +21,16 @@ class Scoreboard extends StatefulWidget {
   _ScoreboardState createState() => _ScoreboardState();
 }
 
-enum TtsState { PLAYING, STOPPED }
-
 class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
-  FlutterTts flutterTts;
   dynamic languages;
 
   List<List<TeamCard>> arguments;
 
+  TextToSpeech tts;
+
   List<TeamCard> teamsFromArgs;
 
   bool isSingleGame;
-
-  double volume = 1.0;
 
   String playerOneName;
 
@@ -50,12 +47,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   int playerOneScore = 0;
 
   int playerTwoScore = 0;
-
-  TtsState ttsState = TtsState.STOPPED;
-
-  get isPlaying => ttsState == TtsState.PLAYING;
-
-  get isStopped => ttsState == TtsState.STOPPED;
 
   bool volumeOn = true;
 
@@ -77,8 +68,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   initState() {
-    initTts();
-
     animationController =
         AnimationController(duration: Duration(seconds: 1), vsync: this);
     animationController2 =
@@ -94,6 +83,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   didChangeDependencies() {
+    tts = Provider.of<TextToSpeech>(context);
+
     arguments = ModalRoute.of(context).settings.arguments;
 
     isSingleGame = arguments == null;
@@ -145,34 +136,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     super.didChangeDependencies();
   }
 
-  initTts() {
-    flutterTts = FlutterTts();
-
-    flutterTts.setStartHandler(() {
-      setState(() {
-        print("playing");
-        ttsState = TtsState.PLAYING;
-      });
-    });
-
-    flutterTts.setCompletionHandler(() {
-      setState(() {
-        print("Complete");
-        ttsState = TtsState.STOPPED;
-      });
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      setState(() {
-        print("error: $msg");
-        ttsState = TtsState.STOPPED;
-      });
-    });
-  }
-
   Future _speak({int playerOneScore, int playerTwoScore}) async {
-    await flutterTts.setVolume(volume);
-
     String playerToInsult = '';
     List<String> insultList = [];
     if (playerOneScore < playerTwoScore) {
@@ -184,20 +148,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     } else if (playerOneScore == playerTwoScore) {
       insultList = strings.tieGameInsults();
     }
-    if (ttsState != TtsState.PLAYING) {
-      var result = await flutterTts.speak(insultList.first);
-      if (result == 1) setState(() => ttsState = TtsState.PLAYING);
-    }
-  }
 
-  Future _stop() async {
-    var result = await flutterTts.stop();
-    if (result == 1) setState(() => ttsState = TtsState.STOPPED);
+    setState(() {
+      tts.speak(insultList.first);
+    });
   }
 
   @override
   void dispose() {
-    flutterTts.stop();
+    tts.stop();
     animationController.dispose();
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
@@ -428,12 +387,14 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void changeVolume() {
+    final tts = Provider.of<TextToSpeech>(context);
+
     if (volumeOn) {
-      volume = 0.0;
+      tts.volume = 0.0;
       volumeOn = false;
-      _stop();
+      tts.stop();
     } else {
-      volume = 1.0;
+      tts.volume = 1.0;
       volumeOn = true;
     }
   }

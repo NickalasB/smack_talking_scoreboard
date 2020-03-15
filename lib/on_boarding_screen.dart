@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smack_talking_scoreboard/main_menu_screen.dart';
+import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/ui_components/ftw_button.dart';
 import 'package:smack_talking_scoreboard/ui_components/player.dart';
 import 'package:smack_talking_scoreboard/ui_components/speak_button.dart';
@@ -187,10 +189,12 @@ class OnBoardingScreenButtons extends StatefulWidget {
 }
 
 class _OnBoardingScreenButtonsState extends State<OnBoardingScreenButtons> {
-  bool isVolumeOn = true;
+  bool volumeIsOn = true;
 
   @override
   Widget build(BuildContext context) {
+    final tts = Provider.of<TextToSpeech>(context, listen: false);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -199,17 +203,23 @@ class _OnBoardingScreenButtonsState extends State<OnBoardingScreenButtons> {
         OnBoardingButtonColumn(
           text: strings.changePlayerDescription,
           button: SpeakButton(
-            onPressed: () => setState(() {}),
+            onPressed: () {
+              setState(() {
+                if (volumeIsOn) tts.speak(strings.changePlayerAnnouncement);
+              });
+            },
           ),
           reverse: true,
         ),
         OnBoardingButtonColumn(
           text: strings.volumeDescription,
           button: VolumeButton(
-            volumeOn: isVolumeOn,
+            volumeOn: volumeIsOn,
             onPressed: () {
-              isVolumeOn = !isVolumeOn;
-              setState(() {});
+              volumeIsOn = !volumeIsOn;
+              setState(() {
+                if (!volumeIsOn) tts.stop();
+              });
             },
           ),
         ),
