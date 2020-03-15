@@ -222,8 +222,9 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       ),
       VolumeButton(
         onPressed: () {
-          changeVolume();
-          setState(() {});
+          setState(() {
+            changeVolume();
+          });
         },
         volumeOn: volumeOn,
       ),
@@ -387,7 +388,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void changeVolume() {
-    final tts = Provider.of<TextToSpeech>(context);
+    final tts = Provider.of<TextToSpeech>(context, listen: false);
 
     if (volumeOn) {
       tts.volume = 0.0;
