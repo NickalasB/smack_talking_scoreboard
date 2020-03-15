@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
 import 'package:smack_talking_scoreboard/team_card.dart';
-import 'package:smack_talking_scoreboard/top_level_functions.dart';
+import 'package:smack_talking_scoreboard/text_to_speech.dart';
+import 'package:smack_talking_scoreboard/ui_components/ftw_button.dart';
+import 'package:smack_talking_scoreboard/ui_components/player.dart';
+import 'package:smack_talking_scoreboard/ui_components/speak_button.dart';
+import 'package:smack_talking_scoreboard/ui_components/volume_button.dart';
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 
 import 'models/winners.dart';
 
@@ -18,19 +21,16 @@ class Scoreboard extends StatefulWidget {
   _ScoreboardState createState() => _ScoreboardState();
 }
 
-enum TtsState { PLAYING, STOPPED }
-
 class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
-  FlutterTts flutterTts;
   dynamic languages;
 
   List<List<TeamCard>> arguments;
 
+  TextToSpeech tts;
+
   List<TeamCard> teamsFromArgs;
 
   bool isSingleGame;
-
-  double volume = 1.0;
 
   String playerOneName;
 
@@ -47,12 +47,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   int playerOneScore = 0;
 
   int playerTwoScore = 0;
-
-  TtsState ttsState = TtsState.STOPPED;
-
-  get isPlaying => ttsState == TtsState.PLAYING;
-
-  get isStopped => ttsState == TtsState.STOPPED;
 
   bool volumeOn = true;
 
@@ -74,8 +68,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   initState() {
-    initTts();
-
     animationController =
         AnimationController(duration: Duration(seconds: 1), vsync: this);
     animationController2 =
@@ -91,6 +83,8 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   didChangeDependencies() {
+    tts = Provider.of<TextToSpeech>(context);
+
     arguments = ModalRoute.of(context).settings.arguments;
 
     isSingleGame = arguments == null;
@@ -142,35 +136,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     super.didChangeDependencies();
   }
 
-  initTts() {
-    flutterTts = FlutterTts();
-
-    flutterTts.setStartHandler(() {
-      setState(() {
-        print("playing");
-        ttsState = TtsState.PLAYING;
-      });
-    });
-
-    flutterTts.setCompletionHandler(() {
-      setState(() {
-        print("Complete");
-        ttsState = TtsState.STOPPED;
-      });
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      setState(() {
-        print("error: $msg");
-        ttsState = TtsState.STOPPED;
-      });
-    });
-  }
-
   Future _speak({int playerOneScore, int playerTwoScore}) async {
-    await flutterTts.setVolume(volume);
-    print('Volume = $volume');
-
     String playerToInsult = '';
     List<String> insultList = [];
     if (playerOneScore < playerTwoScore) {
@@ -182,20 +148,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     } else if (playerOneScore == playerTwoScore) {
       insultList = strings.tieGameInsults();
     }
-    if (ttsState != TtsState.PLAYING) {
-      var result = await flutterTts.speak(insultList.first);
-      if (result == 1) setState(() => ttsState = TtsState.PLAYING);
-    }
-  }
 
-  Future _stop() async {
-    var result = await flutterTts.stop();
-    if (result == 1) setState(() => ttsState = TtsState.STOPPED);
+    setState(() {
+      tts.speak(insultList.first);
+    });
   }
 
   @override
   void dispose() {
-    flutterTts.stop();
+    tts.stop();
     animationController.dispose();
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
@@ -248,7 +209,25 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       }
     }
 
-    print('GameOver = $gameOver');
+    List<Widget> scoreboardButtons = [
+      FtwButton(
+        onChanged: updateScoreToWin,
+        controller: ftwTextEditingController,
+      ),
+      SpeakButton(
+        onPressed: () => onSpeakButtonPressed(
+          playerOneWins,
+          playerTwoWins,
+        ),
+      ),
+      VolumeButton(
+        onPressed: () {
+          changeVolume();
+          setState(() {});
+        },
+        volumeOn: volumeOn,
+      ),
+    ];
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -267,12 +246,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                buildFtwField(),
-                                buildPlayerTurnButton(
-                                    playerOneWins, playerTwoWins),
-                                buildVolumeButton(),
-                              ],
+                              children: scoreboardButtons,
                             ),
                             Expanded(
                               child: buildPlayer2(),
@@ -295,12 +269,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
                             SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                buildFtwField(),
-                                buildPlayerTurnButton(
-                                    playerOneWins, playerTwoWins),
-                                buildVolumeButton(),
-                              ],
+                              children: scoreboardButtons,
                             ),
                           ],
                         ),
@@ -392,74 +361,24 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     );
   }
 
-  Widget buildVolumeButton() {
-    return IconButton(
-      icon: volumeOn ? Icon(Icons.volume_up) : Icon(Icons.volume_off),
-      iconSize: 64,
-      color: Colors.grey,
-      splashColor: Colors.greenAccent,
-      onPressed: () {
-        changeVolume();
-        setState(() {});
-      },
-    );
-  }
-
-  Widget buildPlayerTurnButton(bool playerOneWins, bool playerTwoWins) {
-    return IconButton(
-      icon: Icon(Icons.check_circle),
-      iconSize: 64,
-      color: Colors.green,
-      splashColor: Colors.greenAccent,
-      onPressed: () {
-        if (playerTurnButtonEnabled) {
-          if (playerOneWins) {
-            adjustPlayerOpacity();
-            animationController.forward(from: 0);
-            playerOneWinCount++;
-            playerTurnButtonEnabled = false;
-          } else if (playerTwoWins) {
-            adjustPlayerOpacity();
-            animationController2.forward(from: 0);
-            playerTwoWinCount++;
-            playerTurnButtonEnabled = false;
-          }
-          if (volumeOn) {
-            _speak(
-                playerOneScore: playerOneScore, playerTwoScore: playerTwoScore);
-          }
-          setState(() {});
-        }
-      },
-    );
-  }
-
-  Widget buildFtwField() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: new BoxDecoration(
-          color: Colors.yellow[500],
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: TextField(
-            showCursor: true,
-            onChanged: updateScoreToWin,
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            controller: ftwTextEditingController,
-            decoration: InputDecoration.collapsed(hintText: strings.forTheWin),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
-          ),
-        ),
-      ),
-    );
+  void onSpeakButtonPressed(bool playerOneWins, bool playerTwoWins) {
+    if (playerTurnButtonEnabled) {
+      if (playerOneWins) {
+        adjustPlayerOpacity();
+        animationController.forward(from: 0);
+        playerOneWinCount++;
+        playerTurnButtonEnabled = false;
+      } else if (playerTwoWins) {
+        adjustPlayerOpacity();
+        animationController2.forward(from: 0);
+        playerTwoWinCount++;
+        playerTurnButtonEnabled = false;
+      }
+      if (volumeOn) {
+        _speak(playerOneScore: playerOneScore, playerTwoScore: playerTwoScore);
+      }
+      setState(() {});
+    }
   }
 
   void adjustPlayerOpacity() {
@@ -468,12 +387,14 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void changeVolume() {
+    final tts = Provider.of<TextToSpeech>(context);
+
     if (volumeOn) {
-      volume = 0.0;
+      tts.volume = 0.0;
       volumeOn = false;
-      _stop();
+      tts.stop();
     } else {
-      volume = 0.5;
+      tts.volume = 1.0;
       volumeOn = true;
     }
   }
@@ -520,144 +441,5 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
         playerTurnButtonEnabled = true;
       });
     }
-  }
-}
-
-class Player extends StatelessWidget {
-  const Player(
-      {@required this.scoreDragFunction,
-      @required this.longPressFunction,
-      @required this.singleTapFunction,
-      @required this.nameFunction,
-      @required this.score,
-      @required this.color,
-      @required this.cursorColor,
-      @required this.hint,
-      @required this.opacity,
-      @required this.animation,
-      this.textEditingController,
-      @required this.winCount,
-      @required this.roundsToWin,
-      this.playerName,
-      @required this.isSingleGame});
-
-  final Function scoreDragFunction;
-  final Function longPressFunction;
-  final Function singleTapFunction;
-  final Function nameFunction;
-  final int score;
-  final Color color;
-  final Color cursorColor;
-  final String hint;
-  final double opacity;
-  final Animation animation;
-  final TextEditingController textEditingController;
-  final int winCount;
-  final int roundsToWin;
-  final String playerName;
-  final bool isSingleGame;
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = opacity == 1.0;
-    return Column(
-      children: <Widget>[
-        Container(
-          alignment: Alignment.topCenter,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.all(
-              Radius.circular(8),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: TextField(
-              enabled: isSingleGame,
-              showCursor: true,
-              textCapitalization: TextCapitalization.words,
-              cursorColor: cursorColor,
-              onChanged: nameFunction,
-              decoration: InputDecoration(hintText: hint),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-                color: Colors.grey[200],
-              ),
-              controller: textEditingController,
-            ),
-          ),
-        ),
-        SizedBox(height: 4),
-        Expanded(
-          child: Stack(
-            children: <Widget>[
-              Opacity(
-                opacity: opacity,
-                child: GestureDetector(
-                  onVerticalDragEnd: (details) {
-                    if (enabled) scoreDragFunction(details);
-                  },
-                  onLongPress: longPressFunction,
-                  onTap: enabled ? singleTapFunction : null,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: RotationTransition(
-                      turns: animation,
-                      child: FittedBox(
-                        child: Text(
-                          score.toString(),
-                          style: TextStyle(
-                            color: Colors.grey[200],
-                            fontSize: 220,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Row(
-                    children: [
-                      Text(
-                        strings.wins,
-                        style: TextStyle(
-                            color: Colors.grey[200],
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      RotationTransition(
-                        turns: animation,
-                        child: Text(
-                          roundsToWin != null
-                              ? strings.winCountVsRoundCount(
-                                  winCount: winCount.toString(),
-                                  roundsToWin: roundsToWin.toString(),
-                                )
-                              : winCount.toString(),
-                          style: TextStyle(
-                              color: Colors.grey[200],
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
 Color generateProperTeamColor(int teamNumber) {
   return teamNumber % 2 == 0 ? Colors.blue : Colors.red;

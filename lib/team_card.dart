@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smack_talking_scoreboard/strings.dart' as strings;
-import 'package:smack_talking_scoreboard/top_level_functions.dart';
+import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
+import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 
 class TeamCard extends StatelessWidget {
   const TeamCard(

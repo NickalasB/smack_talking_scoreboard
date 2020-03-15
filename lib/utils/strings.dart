@@ -1,5 +1,29 @@
 import 'package:flutter/cupertino.dart';
 
+const String skip = 'Skip';
+const String done = 'Done';
+const String loadingText = 'One sec';
+
+const String onBoardPage1Title = 'The Scoreboard...';
+const String onBoardPage1Bullet1 = '• TAP or SWIPE UP to increase the score';
+const String onBoardPage1Bullet2 = '• SWIPE DOWN to decrease the score';
+const String onBoardPage1Bullet3 =
+    '• LONG PRESS on the score to reset the scores';
+const String onBoardPage1Footer = 'Feel free to try it out above';
+
+const String onBoardPage2Title = 'The buttons...';
+const String onBoardPage2Bullet1 = '• Set a winning score using the FTW BUTTON';
+const String onBoardPage2Bullet2 =
+    '• Click the CHANGE PLAYER button after each turn to hear some special "motivation"';
+const String onBoardPage2Bullet3 =
+    '• Shut the computer up with the VOLUME button ';
+
+const ftwDescription = 'Score "For The Win"';
+const changePlayerDescription = 'Change Player';
+const changePlayerAnnouncement =
+    'I hope this app is cooler than this lame tutorial';
+const volumeDescription = 'Volume on/off';
+
 const String mainMenuTitle = 'SMACK TALKING SCOREBOARD';
 const String singleGameLabel = 'Single Game';
 const String tournamentLabel = 'Tournament';
