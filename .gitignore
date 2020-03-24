@@ -9,7 +9,7 @@
 .history
 .svn/
 
-#iOS Relate
+#iOS Related
 ios/Runner/GoogleService-Info.plist
 
 #Android Related
