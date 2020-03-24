@@ -9,6 +9,9 @@
 .history
 .svn/
 
+#iOS Related
+ios/Runner/GoogleService-Info.plist
+
 #Android Related
 android/key.properties
 android/app/google-services.json
