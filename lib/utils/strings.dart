@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
+const String chooseGameMode = 'Choose Game Mode';
+const String offLine = 'Off-line';
+const String onLine = 'Online';
+
 const String skip = 'Skip';
 const String done = 'Done';
 const String loadingText = 'One sec';

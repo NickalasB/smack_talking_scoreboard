@@ -103,7 +103,33 @@ class GameButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(16),
       child: RaisedButton(
-        onPressed: () => Navigator.pushNamed(context, routeId),
+        onPressed: () => showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Center(
+              child: Text(
+                strings.chooseGameMode,
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  strings.onLine,
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              FlatButton(
+                onPressed: () => Navigator.popAndPushNamed(context, routeId),
+                child: Text(
+                  strings.offLine,
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+            ],
+          ),
+        ),
         elevation: 4,
         child: FittedBox(
           child: Text(
@@ -120,3 +146,5 @@ class GameButton extends StatelessWidget {
     );
   }
 }
+
+//Navigator.pushNamed(context, routeId)
