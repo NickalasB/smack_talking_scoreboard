@@ -8,6 +8,8 @@ import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
+import 'firebase/base_auth.dart';
+
 class MainMenuScreen extends StatefulWidget {
   static const String id = 'main_menu';
 
@@ -100,6 +102,8 @@ class GameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Auth.of(context);
+
     return Padding(
       padding: EdgeInsets.all(16),
       child: RaisedButton(
@@ -114,7 +118,15 @@ class GameButton extends StatelessWidget {
             ),
             actions: <Widget>[
               FlatButton(
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () async => auth.signInWithGoogle().then(
+                  (_) {
+                    if (auth.authStatus == AuthStatus.LOGGED_IN) {
+                      Navigator.pop(context, true);
+                    }
+                  },
+                ).catchError(
+                  (e) => print(e),
+                ),
                 child: Text(
                   strings.onLine,
                   style: TextStyle(fontSize: 20),
