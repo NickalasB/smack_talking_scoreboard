@@ -20,13 +20,15 @@ class Auth {
   static Auth of(BuildContext context) =>
       Provider.of<Auth>(context, listen: false);
 
-  Future<FirebaseUser> signInWithEmail(String email, String password) async {
+  Future<FirebaseUser> signInWithEmail(
+      {@required String email, @required String password}) async {
     AuthResult result;
 
     try {
       result = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
       _authStatus = AuthStatus.LOGGED_IN;
+      print('Successfully signed in with $email');
     } catch (e) {
       print('Problem logging in $e');
       _authStatus = AuthStatus.LOGGED_OUT;
@@ -34,13 +36,15 @@ class Auth {
     return result.user;
   }
 
-  Future<FirebaseUser> signUpWithEmail(String email, String password) async {
+  Future<FirebaseUser> signUpWithEmail(
+      {@required String email, @required String password}) async {
     AuthResult result;
 
     try {
       result = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
       _authStatus = AuthStatus.LOGGED_IN;
+      print('Successfully signed up with $email');
     } catch (e) {
       print('Problem logging in $e');
       _authStatus = AuthStatus.LOGGED_OUT;
