@@ -155,7 +155,7 @@ class _SignInDialogState extends State<SignInDialog> {
             ),
             SizedBox(height: 16),
             _EmailPasswordForm(auth),
-            RaisedButton(
+            OutlineButton(
               onPressed: () async => auth.signInWithGoogle().then(
                 (_) {
                   if (auth.authStatus == AuthStatus.LOGGED_IN) {
@@ -165,7 +165,36 @@ class _SignInDialogState extends State<SignInDialog> {
               ).catchError(
                 (e) => print(e),
               ),
-              child: const Text(strings.signInWithGoogle),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
+              child: Container(
+                height: 48,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image(
+                            image: AssetImage("assets/google_logo.png"),
+                            height: 35.0),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            strings.signInWithGoogle,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             )
           ],
         ),
