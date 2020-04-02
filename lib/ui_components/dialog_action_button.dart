@@ -19,7 +19,7 @@ class DialogActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 64,
+      height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(8),
