@@ -1,8 +1,19 @@
 import 'package:flutter/cupertino.dart';
 
 const String chooseGameMode = 'Choose Game Mode';
+const String logInModalBody =
+    'Create an account or sign in to enable real-time online scoring';
 const String offLine = 'Play Off-line';
+const String email = 'Email';
+const String password = 'Password';
+const String createAccount = 'Create Account';
+const String signIn = 'Sign In';
+const String signInWithGoogle = 'Sign in with Google';
 const String onLine = 'Online';
+const String passwordBlankError = 'Password cannot be blank';
+const String passwordLengthError =
+    'Password must contain at least 6 characters';
+const String emailError = 'Please enter a valid email address';
 
 const String skip = 'Skip';
 const String done = 'Done';

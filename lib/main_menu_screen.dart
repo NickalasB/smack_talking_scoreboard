@@ -7,6 +7,7 @@ import 'package:smack_talking_scoreboard/on_boarding_screen.dart';
 import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
+import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
 import 'firebase/base_auth.dart';
@@ -164,7 +165,7 @@ class _SignInDialogState extends State<SignInDialog> {
               ).catchError(
                 (e) => print(e),
               ),
-              child: const Text('Sign in with Google'),
+              child: const Text(strings.signInWithGoogle),
             )
           ],
         ),
@@ -206,7 +207,7 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
         children: <Widget>[
           Container(
             child: const Text(
-              'Create an account to enable real-time online scoring',
+              strings.logInModalBody,
               textAlign: TextAlign.center,
             ),
             padding: const EdgeInsets.all(16),
@@ -214,25 +215,38 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
           ),
           TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: const InputDecoration(labelText: strings.email),
             validator: (String value) => emailValidator(value),
           ),
           TextFormField(
             controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(labelText: strings.password),
             validator: (String value) => passwordValidator(value),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            alignment: Alignment.center,
-            child: RaisedButton(
-              onPressed: () async {
-                if (_formKey.currentState.validate()) {
-                  _signInWithEmailAndPassword(widget.auth);
-                }
-              },
-              child: const Text('Create Account'),
-            ),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              DialogActionButton(
+                onPressedFunction: () async {
+                  if (_formKey.currentState.validate()) {
+                    _signUpWithEmailAndPassword(widget.auth);
+                  }
+                },
+                label: strings.createAccount,
+                borderColor: Colors.green,
+              ),
+              DialogActionButton(
+                onPressedFunction: () async {
+                  if (_formKey.currentState.validate()) {
+                    _signInWithEmailAndPassword(widget.auth);
+                  }
+                },
+                label: strings.signIn,
+                backgroundColor: Colors.blue,
+                textColor: Colors.white,
+              ),
+            ],
           ),
           Container(
             alignment: Alignment.center,
@@ -253,9 +267,9 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
 
   String passwordValidator(String value) {
     if (value.isEmpty) {
-      return 'Password cannot be blank';
+      return strings.passwordBlankError;
     } else if (value.length < 6) {
-      return 'Password must contain at least 6 characters';
+      return strings.passwordLengthError;
     }
     return null;
   }
@@ -263,7 +277,7 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
   String emailValidator(String value) {
     if (value.isEmpty ||
         !RegExp(r"^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$").hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return strings.emailError;
     }
     return null;
   }
@@ -275,8 +289,23 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
     super.dispose();
   }
 
-  void _signInWithEmailAndPassword(Auth auth) async {
+  void _signUpWithEmailAndPassword(Auth auth) async {
     final FirebaseUser user = (await auth.signUpWithEmail(
+      email: _emailController.text,
+      password: _passwordController.text,
+    ));
+    if (user != null) {
+      setState(() {
+        _success = true;
+        _userEmail = user.email;
+      });
+    } else {
+      _success = false;
+    }
+  }
+
+  void _signInWithEmailAndPassword(Auth auth) async {
+    final FirebaseUser user = (await auth.signInWithEmail(
       email: _emailController.text,
       password: _passwordController.text,
     ));
