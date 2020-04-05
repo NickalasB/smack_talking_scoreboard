@@ -226,7 +226,7 @@ class _SignInDialogState extends State<SignInDialog> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Image(
-                            image: AssetImage("assets/google_logo.png"),
+                            image: AssetImage('assets/google_logo.png'),
                             height: 35.0),
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
