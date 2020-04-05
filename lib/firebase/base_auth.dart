@@ -5,17 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
-enum AuthStatus {
-  UNKNOWN,
-  LOGGED_IN,
-  LOGGED_OUT,
-}
-
 class Auth {
   final _firebaseAuth = FirebaseAuth.instance;
   final _googleSignIn = GoogleSignIn();
-
-  AuthStatus _authStatus;
 
   static Auth of(BuildContext context) =>
       Provider.of<Auth>(context, listen: false);
@@ -24,15 +16,10 @@ class Auth {
       {@required String email, @required String password}) async {
     AuthResult result;
 
-    try {
-      result = await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      _authStatus = AuthStatus.LOGGED_IN;
-      print('Successfully signed in with $email');
-    } catch (e) {
-      print('Problem logging in $e');
-      _authStatus = AuthStatus.LOGGED_OUT;
-    }
+    result = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    print('Successfully signed in with $email');
+
     return result.user;
   }
 
@@ -40,15 +27,10 @@ class Auth {
       {@required String email, @required String password}) async {
     AuthResult result;
 
-    try {
-      result = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      _authStatus = AuthStatus.LOGGED_IN;
-      print('Successfully signed up with $email');
-    } catch (e) {
-      print('Problem logging in $e');
-      _authStatus = AuthStatus.LOGGED_OUT;
-    }
+    result = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    print('Successfully signed up with $email');
+
     return result.user;
   }
 
@@ -63,14 +45,9 @@ class Auth {
     );
 
     FirebaseUser user;
-    try {
-      user = (await _firebaseAuth.signInWithCredential(credential)).user;
-      print("Successfully signed in " + user.displayName);
-      _authStatus = AuthStatus.LOGGED_IN;
-    } catch (e) {
-      print('Problem logging in $e');
-      _authStatus = AuthStatus.LOGGED_OUT;
-    }
+    user = (await _firebaseAuth.signInWithCredential(credential)).user;
+    print("Successfully signed in " + user.displayName);
+
     return user;
   }
 
@@ -80,13 +57,8 @@ class Auth {
   }
 
   Future<void> signOut() async {
-    try {
-      await _firebaseAuth.signOut();
-      _authStatus = AuthStatus.LOGGED_OUT;
-    } catch (e) {
-      print('Problem logging out: $e');
-      _authStatus = AuthStatus.UNKNOWN;
-    }
+    await _firebaseAuth.signOut();
+    print("Successfully signed out ");
   }
 
   Future<void> sendEmailVerification() async {
@@ -98,6 +70,4 @@ class Auth {
     FirebaseUser user = await _firebaseAuth.currentUser();
     return user.isEmailVerified;
   }
-
-  AuthStatus get authStatus => _authStatus;
 }
