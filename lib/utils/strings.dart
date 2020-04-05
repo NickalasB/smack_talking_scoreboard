@@ -1,5 +1,28 @@
 import 'package:flutter/cupertino.dart';
 
+const String chooseGameMode = 'Choose Game Mode';
+const String logInModalBody =
+    'Create an account or sign in to enable real-time online scoring';
+const String offLine = 'Play Off-line';
+const String email = 'Email';
+const String password = 'Password';
+const String createAccount = 'Create Account';
+const String signIn = 'Sign In';
+const String signOut = 'Sign Out';
+const String signInWithGoogle = 'Sign in with Google';
+const String onLine = 'Online';
+
+const String passwordBlankError = 'Password cannot be blank';
+const String passwordLengthError =
+    'Password must contain at least 6 characters';
+const String emailError = 'Please enter a valid email address';
+const String wrongPasswordError = 'Oops wrong password';
+const String userNotFoundError = 'No user found with that email';
+const String disabledUserError = 'This user has been disabled';
+const String tooManyRequestError = 'Too many sign in attempts';
+const String emailInUseError = 'Email already in use';
+const String defaultSignInError = 'Sign in failed';
+
 const String skip = 'Skip';
 const String done = 'Done';
 const String loadingText = 'One sec';
@@ -24,7 +47,6 @@ const changePlayerAnnouncement =
     'I hope this app is cooler than this lame tutorial';
 const volumeDescription = 'Volume on/off';
 
-const String mainMenuTitle = 'SMACK TALKING SCOREBOARD';
 const String singleGameLabel = 'Single Game';
 const String tournamentLabel = 'Tournament';
 
