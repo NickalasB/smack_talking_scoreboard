@@ -8,6 +8,7 @@ const String email = 'Email';
 const String password = 'Password';
 const String createAccount = 'Create Account';
 const String signIn = 'Sign In';
+const String signOut = 'Sign Out';
 const String signInWithGoogle = 'Sign in with Google';
 const String onLine = 'Online';
 

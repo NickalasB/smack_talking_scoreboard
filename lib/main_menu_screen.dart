@@ -70,11 +70,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                           SizedBox(height: 16),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: Icon(Icons.settings),
-                              onPressed: () => Auth.of(context).signOut(),
-                              color: Colors.black45,
-                            ),
+                            child: SettingsButton(),
                           ),
                           Expanded(
                             child: Column(
@@ -101,6 +97,58 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       }),
     );
   }
+}
+
+class SettingsButton extends StatefulWidget {
+  const SettingsButton();
+
+  @override
+  _SettingsButtonState createState() => _SettingsButtonState();
+}
+
+class _SettingsButtonState extends State<SettingsButton> {
+  FirebaseUser user;
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Auth.of(context);
+    checkIfLoggedIn(auth);
+
+    return PopupMenuButton<SignInState>(
+        icon: Icon(Icons.settings),
+        onSelected: (result) {
+          if (result == SignInState.signOut) {
+            auth.signOut().then((_) => setState(() {}));
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) => SignInDialog(),
+            ).then((_) => setState(() {}));
+          }
+        },
+        itemBuilder: (context) {
+          return <PopupMenuEntry<SignInState>>[
+            user != null
+                ? const PopupMenuItem<SignInState>(
+                    value: SignInState.signOut,
+                    child: Text(strings.signOut),
+                  )
+                : const PopupMenuItem<SignInState>(
+                    value: SignInState.signIn,
+                    child: Text(strings.signIn),
+                  ),
+          ];
+        });
+  }
+
+  Future<void> checkIfLoggedIn(Auth auth) async {
+    user = await auth.getCurrentUser();
+  }
+}
+
+enum SignInState {
+  signIn,
+  signOut,
 }
 
 class GameButton extends StatelessWidget {
@@ -140,7 +188,7 @@ class GameButton extends StatelessWidget {
 
 class SignInDialog extends StatefulWidget {
   const SignInDialog({
-    @required this.routeId,
+    this.routeId,
   });
 
   final String routeId;
