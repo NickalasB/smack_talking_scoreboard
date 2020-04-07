@@ -13,8 +13,19 @@ class Cloudstore {
   }
 
   Future<void> setCollectionData(
-      CollectionReference collection, Map<String, dynamic> data) async {
-    await collection.document('game_document').setData(data);
+    CollectionReference collection,
+    String documentPath,
+    Map<String, dynamic> data,
+  ) async {
+    await collection.document(documentPath).setData(data);
+  }
+
+  Future<void> updateCollectionData(
+    CollectionReference collection,
+    String documentPath,
+    Map<String, dynamic> data,
+  ) async {
+    await collection.document(documentPath).updateData(data);
   }
 
   Future<void> post(
@@ -34,6 +45,15 @@ class Cloudstore {
       await Future.forEach(toBeRetrieved, (DocumentSnapshot snapshot) async {
         await tx.update(snapshot.reference, newData);
       });
+    });
+  }
+
+  Future<void> deleteDocument(
+    CollectionReference collectionRef,
+    String documentPath,
+  ) async {
+    _fbCloudstore.runTransaction((tx) async {
+      await tx.delete(collectionRef.document(documentPath));
     });
   }
 }

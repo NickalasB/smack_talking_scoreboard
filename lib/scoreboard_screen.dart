@@ -96,11 +96,13 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
     singleGameCollection = widget.cloudstore.collection('SingleGame');
 
-    widget.cloudstore.setCollectionData(singleGameCollection, {
+    widget.cloudstore.setCollectionData(singleGameCollection, 'game_doc', {
       'player1Name': playerOneName,
       'player1Score': playerOneScore,
+      'player1WinCount': playerOneWinCount,
       'player2Name': playerTwoName,
       'player2Score': playerTwoScore,
+      'player2WinCount': playerTwoWinCount,
       'ftwScore': scoreToWin,
       'numberOfRounds': null,
       'insult': ''
@@ -175,8 +177,9 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       insultList = strings.tieGameInsults();
     }
 
-    widget.cloudstore
-        .post(singleGameCollection, newData: {'insult': insultList.first});
+    widget.cloudstore.updateCollectionData(
+        singleGameCollection, 'game_doc', {'insult': insultList.first});
+
     setState(() {
       tts.speak(insultList.first);
     });
@@ -189,19 +192,16 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
     ftwTextEditingController.dispose();
+    widget.cloudstore.deleteDocument(singleGameCollection, 'game_doc');
     super.dispose();
   }
 
   void _onChangePlayerOne(String text) {
     playerOneName = text;
-    widget.cloudstore
-        .post(singleGameCollection, newData: {'player1Name': playerOneName});
   }
 
   void _onChangePlayerTwo(String text) {
     playerTwoName = text;
-    widget.cloudstore
-        .post(singleGameCollection, newData: {'player2Name': playerTwoName});
   }
 
   void updateScoreToWin(String text) {
@@ -212,10 +212,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    widget.cloudstore.post(singleGameCollection, newData: {
-      'ftwScore': scoreToWin,
+    widget.cloudstore.updateCollectionData(singleGameCollection, 'game_doc', {
+      'player1Name': playerOneName,
       'player1Score': playerOneScore,
+      'player1WinCount': playerOneWinCount,
+      'player2Name': playerTwoName,
       'player2Score': playerTwoScore,
+      'player2WinCount': playerTwoWinCount,
+      'ftwScore': scoreToWin,
+      'numberOfRounds': roundsToWin,
     });
 
     bool playerOneWins = false;
