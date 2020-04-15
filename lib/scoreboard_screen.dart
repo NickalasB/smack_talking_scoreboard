@@ -197,11 +197,15 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void _onChangePlayerOne(String text) {
-    playerOneName = text;
+    setState(() {
+      playerOneName = text;
+    });
   }
 
   void _onChangePlayerTwo(String text) {
-    playerTwoName = text;
+    setState(() {
+      playerTwoName = text;
+    });
   }
 
   void updateScoreToWin(String text) {
