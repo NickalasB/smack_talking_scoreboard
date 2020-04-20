@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smack_talking_scoreboard/on_boarding_screen.dart';
 import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
@@ -36,7 +35,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
   @override
   void didChangeDependencies() {
-    Provider.of<TextToSpeech>(context).initTts();
+    TextToSpeech.of(context).initTts();
     super.didChangeDependencies();
   }
 
@@ -402,24 +401,7 @@ Future<void> signInThenGoToNextScreen(
     Navigator.popAndPushNamed(context, routeId);
   } catch (e) {
     if (e is PlatformException) {
-      _signInErrorText = mappedErrorCode(e.code);
+      _signInErrorText = strings.mappedErrorCode(e.code);
     }
-  }
-}
-
-String mappedErrorCode(String code) {
-  switch (code) {
-    case 'ERROR_WRONG_PASSWORD':
-      return strings.wrongPasswordError;
-    case 'ERROR_USER_NOT_FOUND':
-      return strings.userNotFoundError;
-    case 'ERROR_USER_DISABLED':
-      return strings.disabledUserError;
-    case 'ERROR_TOO_MANY_REQUESTS':
-      return strings.tooManyRequestError;
-    case 'ERROR_EMAIL_ALREADY_IN_USE':
-      return strings.emailInUseError;
-    default:
-      return strings.defaultSignInError;
   }
 }

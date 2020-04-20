@@ -113,7 +113,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   didChangeDependencies() {
     super.didChangeDependencies();
 
-    tts = Provider.of<TextToSpeech>(context);
+    tts = TextToSpeech.of(context);
 
     arguments = ModalRoute.of(context).settings.arguments;
 
@@ -435,7 +435,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void changeVolume() {
-    final tts = Provider.of<TextToSpeech>(context, listen: false);
+    final tts = TextToSpeech.of(context);
 
     if (volumeOn) {
       tts.volume = 0.0;

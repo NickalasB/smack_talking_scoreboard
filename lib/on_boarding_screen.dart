@@ -193,7 +193,7 @@ class _OnBoardingScreenButtonsState extends State<OnBoardingScreenButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final tts = Provider.of<TextToSpeech>(context, listen: false);
+    final tts = TextToSpeech.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

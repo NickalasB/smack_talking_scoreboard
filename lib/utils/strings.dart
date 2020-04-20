@@ -132,3 +132,20 @@ List<String> tieGameInsults() {
   insultList.shuffle();
   return insultList;
 }
+
+String mappedErrorCode(String code) {
+  switch (code) {
+    case 'ERROR_WRONG_PASSWORD':
+      return wrongPasswordError;
+    case 'ERROR_USER_NOT_FOUND':
+      return userNotFoundError;
+    case 'ERROR_USER_DISABLED':
+      return disabledUserError;
+    case 'ERROR_TOO_MANY_REQUESTS':
+      return tooManyRequestError;
+    case 'ERROR_EMAIL_ALREADY_IN_USE':
+      return emailInUseError;
+    default:
+      return defaultSignInError;
+  }
+}

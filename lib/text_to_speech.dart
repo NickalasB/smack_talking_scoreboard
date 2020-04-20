@@ -1,8 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart';
 
 enum TtsState { PLAYING, STOPPED }
 
 class TextToSpeech {
+  static TextToSpeech of(BuildContext context) =>
+      Provider.of<TextToSpeech>(context, listen: false);
+
   FlutterTts flutterTts;
 
   TtsState ttsState = TtsState.STOPPED;
