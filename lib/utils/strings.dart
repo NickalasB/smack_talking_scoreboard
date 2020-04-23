@@ -72,6 +72,11 @@ const String exitDialogYes = 'YES';
 const String exitDialogNo = 'NO';
 
 const String versus = 'VS';
+
+final String pickYourPoison = 'Pick Your Poison';
+final String joinExisting = 'Join Existing';
+final String createNew = 'Create New';
+
 String teamCardTitle(int ftwScore, int numberOfRounds) {
   final plural = numberOfRounds > 1;
   return 'First to ${ftwScore.toString()}: ${numberOfRounds.toString()} ${plural ? 'Rounds' : 'Round'}';
