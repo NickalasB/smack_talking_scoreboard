@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smack_talking_scoreboard/firebase/base_cloudstore.dart';
 import 'package:smack_talking_scoreboard/team_card.dart';
 import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/ui_components/ftw_button.dart';
@@ -12,10 +14,20 @@ import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 
 import 'models/winners.dart';
 
+class ScoreboardScreen extends StatelessWidget {
+  const ScoreboardScreen();
+  @override
+  Widget build(BuildContext context) {
+    return Scoreboard(Cloudstore.of(context));
+  }
+}
+
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
 
-  const Scoreboard();
+  const Scoreboard(this.cloudstore);
+
+  final Cloudstore cloudstore;
 
   @override
   _ScoreboardState createState() => _ScoreboardState();
@@ -66,8 +78,12 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   int playerTwoWinCount = 0;
   bool playerTurnButtonEnabled = true;
 
+  CollectionReference singleGameCollection;
+
   @override
   initState() {
+    super.initState();
+
     animationController =
         AnimationController(duration: Duration(seconds: 1), vsync: this);
     animationController2 =
@@ -78,12 +94,26 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     animation2 =
         CurvedAnimation(parent: animationController2, curve: Curves.easeIn);
 
-    super.initState();
+    singleGameCollection = widget.cloudstore.collection('SingleGame');
+
+    widget.cloudstore.setCollectionData(singleGameCollection, 'game_doc', {
+      'player1Name': playerOneName,
+      'player1Score': playerOneScore,
+      'player1WinCount': playerOneWinCount,
+      'player2Name': playerTwoName,
+      'player2Score': playerTwoScore,
+      'player2WinCount': playerTwoWinCount,
+      'ftwScore': scoreToWin,
+      'numberOfRounds': null,
+      'insult': ''
+    });
   }
 
   @override
   didChangeDependencies() {
-    tts = Provider.of<TextToSpeech>(context);
+    super.didChangeDependencies();
+
+    tts = TextToSpeech.of(context);
 
     arguments = ModalRoute.of(context).settings.arguments;
 
@@ -132,8 +162,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player2TextEditingController = TextEditingController(text: playerTwoName);
     ftwTextEditingController =
         TextEditingController(text: scoreToWin?.toString());
-
-    super.didChangeDependencies();
   }
 
   Future _speak({int playerOneScore, int playerTwoScore}) async {
@@ -149,6 +177,9 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
       insultList = strings.tieGameInsults();
     }
 
+    widget.cloudstore.updateCollectionData(
+        singleGameCollection, 'game_doc', {'insult': insultList.first});
+
     setState(() {
       tts.speak(insultList.first);
     });
@@ -161,15 +192,20 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
     ftwTextEditingController.dispose();
+    widget.cloudstore.deleteDocument(singleGameCollection, 'game_doc');
     super.dispose();
   }
 
   void _onChangePlayerOne(String text) {
-    playerOneName = text;
+    setState(() {
+      playerOneName = text;
+    });
   }
 
   void _onChangePlayerTwo(String text) {
-    playerTwoName = text;
+    setState(() {
+      playerTwoName = text;
+    });
   }
 
   void updateScoreToWin(String text) {
@@ -180,6 +216,17 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    widget.cloudstore.updateCollectionData(singleGameCollection, 'game_doc', {
+      'player1Name': playerOneName,
+      'player1Score': playerOneScore,
+      'player1WinCount': playerOneWinCount,
+      'player2Name': playerTwoName,
+      'player2Score': playerTwoScore,
+      'player2WinCount': playerTwoWinCount,
+      'ftwScore': scoreToWin,
+      'numberOfRounds': roundsToWin,
+    });
+
     bool playerOneWins = false;
     bool playerTwoWins = false;
     bool gameOver = false;
@@ -388,7 +435,7 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   }
 
   void changeVolume() {
-    final tts = Provider.of<TextToSpeech>(context, listen: false);
+    final tts = TextToSpeech.of(context);
 
     if (volumeOn) {
       tts.volume = 0.0;

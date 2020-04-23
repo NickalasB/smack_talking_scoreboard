@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smack_talking_scoreboard/google_sign_in_button.dart';
 import 'package:smack_talking_scoreboard/on_boarding_screen.dart';
 import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/text_to_speech.dart';
@@ -11,6 +11,7 @@ import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
 import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
+import 'create_or_join_dialog.dart';
 import 'firebase/base_auth.dart';
 
 String _signInErrorText;
@@ -36,7 +37,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
   @override
   void didChangeDependencies() {
-    Provider.of<TextToSpeech>(context).initTts();
+    TextToSpeech.of(context).initTts();
     super.didChangeDependencies();
   }
 
@@ -107,12 +108,9 @@ class SettingsButton extends StatefulWidget {
 }
 
 class _SettingsButtonState extends State<SettingsButton> {
-  FirebaseUser user;
-
   @override
   Widget build(BuildContext context) {
     final auth = Auth.of(context);
-    checkIfLoggedIn(auth);
 
     return PopupMenuButton<SignInState>(
         icon: Icon(Icons.settings),
@@ -128,7 +126,7 @@ class _SettingsButtonState extends State<SettingsButton> {
         },
         itemBuilder: (context) {
           return <PopupMenuEntry<SignInState>>[
-            user != null
+            auth.getCurrentUser() != null
                 ? const PopupMenuItem<SignInState>(
                     value: SignInState.signOut,
                     child: Text(strings.signOut),
@@ -139,10 +137,6 @@ class _SettingsButtonState extends State<SettingsButton> {
                   ),
           ];
         });
-  }
-
-  Future<void> checkIfLoggedIn(Auth auth) async {
-    user = await auth.getCurrentUser();
   }
 }
 
@@ -168,7 +162,7 @@ class GameButton extends StatelessWidget {
                 context: context,
                 builder: (context) => SignInDialog(routeId: routeId),
               )
-            : Navigator.pushNamed(context, routeId),
+            : showCreateOrJoinGameDialog(context, routeId),
         elevation: 4,
         child: FittedBox(
           child: Text(
@@ -210,40 +204,14 @@ class _SignInDialogState extends State<SignInDialog> {
             ),
             SizedBox(height: 16),
             _EmailPasswordForm(widget.routeId),
-            OutlineButton(
-              onPressed: () => signInThenGoToNextScreen(
-                  context, Auth.of(context).signInWithGoogle(), widget.routeId),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4)),
-              child: Container(
-                height: 48,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image(
-                            image: AssetImage('assets/google_logo.png'),
-                            height: 35.0),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(
-                            strings.signInWithGoogle,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            GoogleSignInButton(
+              onPressed: () =>
+                  signIn(context, Auth.of(context).signInWithGoogle())
+                      .then((_) => Navigator.of(context).pop())
+                      .then((_) =>
+                          showCreateOrJoinGameDialog(context, widget.routeId))
+                      .then((_) => setState),
+            ),
           ],
         ),
       ),
@@ -371,55 +339,44 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
   }
 
   Future<void> _signUpWithEmailAndPassword() async {
-    await signInThenGoToNextScreen(
+    await signIn(
       context,
       Auth.of(context).signUpWithEmail(
         email: _emailController.text,
         password: _passwordController.text,
       ),
-      widget.routeId,
     );
   }
 
   Future<void> _signInWithEmailAndPassword() async {
-    await signInThenGoToNextScreen(
-        context,
-        Auth.of(context).signInWithEmail(
-          email: _emailController.text,
-          password: _passwordController.text,
-        ),
-        widget.routeId);
+    await signIn(
+      context,
+      Auth.of(context).signInWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ),
+    );
   }
 }
 
-Future<void> signInThenGoToNextScreen(
+Future<void> signIn(
   BuildContext context,
-  Future<FirebaseUser> signIn,
-  String routeId,
+  Future<FirebaseUser> signInMethod,
 ) async {
   try {
-    await signIn;
-    Navigator.popAndPushNamed(context, routeId);
+    await signInMethod;
   } catch (e) {
     if (e is PlatformException) {
-      _signInErrorText = mappedErrorCode(e.code);
+      _signInErrorText = strings.mappedErrorCode(e.code);
     }
   }
 }
 
-String mappedErrorCode(String code) {
-  switch (code) {
-    case 'ERROR_WRONG_PASSWORD':
-      return strings.wrongPasswordError;
-    case 'ERROR_USER_NOT_FOUND':
-      return strings.userNotFoundError;
-    case 'ERROR_USER_DISABLED':
-      return strings.disabledUserError;
-    case 'ERROR_TOO_MANY_REQUESTS':
-      return strings.tooManyRequestError;
-    case 'ERROR_EMAIL_ALREADY_IN_USE':
-      return strings.emailInUseError;
-    default:
-      return strings.defaultSignInError;
-  }
+Future<void> showCreateOrJoinGameDialog(
+    BuildContext context, String routeId) async {
+  showDialog(
+    context: context,
+    builder: (context) => CreateOrJoinGameDialog(routeId),
+    barrierDismissible: false,
+  );
 }
