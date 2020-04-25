@@ -1,6 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smack_talking_scoreboard/create_on_line_game_dialog.dart';
 import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
@@ -54,7 +55,14 @@ class _CreateOrJoinGameDialogState extends State<CreateOrJoinGameDialog>
             ),
             SizedBox(width: 16),
             DialogActionButton(
-              onPressedFunction: () => Navigator.of(context).pop(),
+              onPressedFunction: () async {
+                Navigator.of(context).pop();
+                await showDialog(
+                  context: context,
+                  builder: (context) => CreateOnLineGameDialog(widget.routeId),
+                  barrierDismissible: false,
+                );
+              },
               label: strings.createNew,
               backgroundColor: Colors.blue,
               textColor: Colors.white,

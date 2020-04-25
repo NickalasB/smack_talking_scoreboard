@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 const String chooseGameMode = 'Choose Game Mode';
 const String logInModalBody =
     'Create an account or sign in to enable real-time online scoring';
-const String offLine = 'Play Off-line';
+const String offLine = 'Play off-line';
 const String email = 'Email';
 const String password = 'Password';
 const String createAccount = 'Create Account';
@@ -76,6 +76,8 @@ const String versus = 'VS';
 final String pickYourPoison = 'Pick Your Poison';
 final String joinExisting = 'Join Existing';
 final String createNew = 'Create New';
+final String choseAUniquePin = 'Chose a unique pin for this game';
+final String pinValidationError = 'You already have a game using that pin';
 
 String teamCardTitle(int ftwScore, int numberOfRounds) {
   final plural = numberOfRounds > 1;
