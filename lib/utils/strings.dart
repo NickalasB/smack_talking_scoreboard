@@ -73,7 +73,7 @@ const String exitDialogNo = 'NO';
 
 const String versus = 'VS';
 
-final String pickYourPoison = 'Pick Your Poison';
+final String joiningOrCreating = 'Joining or Creating?';
 final String joinExisting = 'Join Existing';
 final String createNew = 'Create New';
 final String choseAUniquePin = 'Chose a unique pin for this game';

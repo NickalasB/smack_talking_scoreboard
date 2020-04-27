@@ -42,8 +42,9 @@ class _CreateOrJoinGameDialogState extends State<CreateOrJoinGameDialog>
       scale: animation,
       child: AlertDialog(
         title: Text(
-          strings.pickYourPoison,
+          strings.joiningOrCreating,
           textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 24),
         ),
         content: Row(
           children: [

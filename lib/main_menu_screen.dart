@@ -192,28 +192,56 @@ class SignInDialog extends StatefulWidget {
 }
 
 class _SignInDialogState extends State<SignInDialog> {
+  final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Center(
-        child: Column(
-          children: [
-            Text(
-              strings.chooseGameMode,
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 16),
-            _EmailPasswordForm(widget.routeId),
-            GoogleSignInButton(
-              onPressed: () =>
-                  signIn(context, Auth.of(context).signInWithGoogle())
-                      .then((_) => Navigator.of(context).pop())
-                      .then((_) =>
-                          showCreateOrJoinGameDialog(context, widget.routeId))
-                      .then((_) => setState),
-            ),
-          ],
+        child: Text(
+          strings.chooseGameMode,
+          style: TextStyle(fontSize: 24),
         ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text(
+                    strings.logInModalBody,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  _EmailPasswordForm(widget.routeId, isLoadingNotifier),
+                  GoogleSignInButton(
+                    onPressed: () {
+                      isLoadingNotifier.value = true;
+                      return signIn(
+                              context, Auth.of(context).signInWithGoogle())
+                          .then((_) => Navigator.of(context).pop())
+                          .then((_) => showCreateOrJoinGameDialog(
+                              context, widget.routeId))
+                          .then((_) {
+                        setState(() => isLoadingNotifier.value = false);
+                      });
+                    },
+                  ),
+                ],
+              ),
+              ValueListenableBuilder(
+                valueListenable: isLoadingNotifier,
+                builder: (context, bool loading, _) => loading
+                    ? Center(child: CircularProgressIndicator())
+                    : SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ],
       ),
       actions: <Widget>[
         FlatButton(
@@ -229,9 +257,10 @@ class _SignInDialogState extends State<SignInDialog> {
 }
 
 class _EmailPasswordForm extends StatefulWidget {
-  const _EmailPasswordForm(this.routeId);
+  const _EmailPasswordForm(this.routeId, this.isLoadingNotifier);
 
   final String routeId;
+  final ValueNotifier<bool> isLoadingNotifier;
 
   @override
   State<StatefulWidget> createState() => _EmailPasswordFormState();
@@ -255,14 +284,6 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            child: const Text(
-              strings.logInModalBody,
-              textAlign: TextAlign.center,
-            ),
-            padding: const EdgeInsets.all(16),
-            alignment: Alignment.center,
-          ),
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(labelText: strings.email),
@@ -280,8 +301,13 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
               DialogActionButton(
                 onPressedFunction: () async {
                   if (_formKey.currentState.validate()) {
-                    await _signUpWithEmailAndPassword();
-                    setState(() {});
+                    widget.isLoadingNotifier.value = true;
+                    await _signUpWithEmailAndPassword()
+                        .then((_) => Navigator.of(context).pop())
+                        .then((_) =>
+                            showCreateOrJoinGameDialog(context, widget.routeId))
+                        .then((_) => setState(
+                            () => widget.isLoadingNotifier.value = false));
                   }
                 },
                 label: strings.createAccount,
@@ -290,8 +316,13 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
               DialogActionButton(
                 onPressedFunction: () async {
                   if (_formKey.currentState.validate()) {
-                    await _signInWithEmailAndPassword();
-                    setState(() {});
+                    widget.isLoadingNotifier.value = true;
+                    await _signInWithEmailAndPassword()
+                        .then((_) => Navigator.of(context).pop())
+                        .then((_) =>
+                            showCreateOrJoinGameDialog(context, widget.routeId))
+                        .then((_) => setState(
+                            () => widget.isLoadingNotifier.value = false));
                   }
                 },
                 label: strings.signIn,

@@ -21,6 +21,7 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
   String pinValue;
   bool shouldValidate = false;
   bool isValidPin = false;
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
   void initState() {
@@ -80,26 +81,35 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
               ),
             ),
             SizedBox(height: 16),
-            DialogActionButton(
-              onPressedFunction: pinValue?.length == 4
-                  ? () async {
-                      try {
-                        await cloudStore.createSingleGameCollection(
-                          context,
-                          pin: pinValue,
-                        );
-                        await Navigator.popAndPushNamed(
-                          context,
-                          widget.routeId,
-                        );
-                      } catch (e) {
-                        setState(() => isValidPin = false);
-                      }
-                    }
-                  : null,
-              label: strings.start,
-              borderColor: Colors.blue,
-            ),
+            isLoading.value == true
+                ? CircularProgressIndicator()
+                : DialogActionButton(
+                    onPressedFunction: pinValue?.length == 4
+                        ? () async {
+                            setState(() {
+                              isLoading.value = true;
+                            });
+                            try {
+                              await cloudStore.createSingleGameCollection(
+                                context,
+                                pin: pinValue,
+                              );
+                              await Navigator.popAndPushNamed(
+                                context,
+                                widget.routeId,
+                              );
+                            } catch (e) {
+                              setState(() => isValidPin = false);
+                            } finally {
+                              setState(() {
+                                isLoading.value = false;
+                              });
+                            }
+                          }
+                        : null,
+                    label: strings.start,
+                    borderColor: Colors.blue,
+                  ),
           ],
         ),
       ),
