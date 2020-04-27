@@ -84,10 +84,14 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
               onPressedFunction: pinValue?.length == 4
                   ? () async {
                       try {
-                        await cloudStore.createGameCollection(context,
-                            pin: pinValue);
+                        await cloudStore.createSingleGameCollection(
+                          context,
+                          pin: pinValue,
+                        );
                         await Navigator.popAndPushNamed(
-                            context, widget.routeId);
+                          context,
+                          widget.routeId,
+                        );
                       } catch (e) {
                         setState(() => isValidPin = false);
                       }

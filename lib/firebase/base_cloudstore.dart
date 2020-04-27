@@ -71,7 +71,15 @@ class Cloudstore {
     });
   }
 
-  Future<void> createGameCollection(BuildContext context, {String pin}) async {
+  Future<void> deleteSingleGame(BuildContext context, String pin) async {
+    final user = await Auth.of(context).getCurrentUser();
+    final singleGamesCollectionPath = 'accounts/${user.uid}/single_games';
+
+    await collection(singleGamesCollectionPath).document(pin).delete();
+  }
+
+  Future<void> createSingleGameCollection(BuildContext context,
+      {String pin}) async {
     final user = await Auth.of(context).getCurrentUser();
     final singleGamesCollectionPath = 'accounts/${user.uid}/single_games';
     final singleGamesCollection = collection(singleGamesCollectionPath);
