@@ -78,10 +78,12 @@ class Cloudstore {
     await collection(singleGamesCollectionPath).document(pin).delete();
   }
 
-  Future<void> createSingleGameCollection(BuildContext context,
-      {String pin}) async {
+  Future<void> createSingleGameCollection(
+    BuildContext context, {
+    String pin,
+  }) async {
     final user = await Auth.of(context).getCurrentUser();
-    final singleGamesCollectionPath = 'accounts/${user.uid}/single_games';
+    final singleGamesCollectionPath = 'accounts/${user.email}/single_games';
     final singleGamesCollection = collection(singleGamesCollectionPath);
     final allDocs = await singleGamesCollection.getDocuments();
 
@@ -91,7 +93,7 @@ class Cloudstore {
       throw Exception();
     } else {
       await collection('accounts')
-          .document(user.uid)
+          .document(user.email)
           .collection('single_games')
           .document(pin)
           .setData(gameElements);
