@@ -93,20 +93,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
         CurvedAnimation(parent: animationController, curve: Curves.easeIn);
     animation2 =
         CurvedAnimation(parent: animationController2, curve: Curves.easeIn);
-
-    singleGameCollection = widget.cloudstore.collection('SingleGame');
-
-    widget.cloudstore.setCollectionData(singleGameCollection, 'game_doc', {
-      'player1Name': playerOneName,
-      'player1Score': playerOneScore,
-      'player1WinCount': playerOneWinCount,
-      'player2Name': playerTwoName,
-      'player2Score': playerTwoScore,
-      'player2WinCount': playerTwoWinCount,
-      'ftwScore': scoreToWin,
-      'numberOfRounds': null,
-      'insult': ''
-    });
   }
 
   @override
