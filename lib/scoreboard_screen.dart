@@ -178,7 +178,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
     ftwTextEditingController.dispose();
-    widget.cloudstore.deleteDocument(singleGameCollection, 'game_doc');
     super.dispose();
   }
 
