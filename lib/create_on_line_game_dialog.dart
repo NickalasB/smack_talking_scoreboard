@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:smack_talking_scoreboard/firebase/base_cloudstore.dart';
+import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
@@ -43,6 +44,7 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
   @override
   Widget build(BuildContext context) {
     final cloudStore = Cloudstore.of(context);
+    final navigator = Navigator.of(context);
     return ScaleTransition(
       scale: animation,
       child: AlertDialog(
@@ -94,9 +96,12 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
                                 context,
                                 pin: pinValue,
                               );
-                              await Navigator.popAndPushNamed(
-                                context,
-                                widget.routeId,
+                              navigator.pop();
+                              navigator.push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ScoreboardScreen(pinValue),
+                                ),
                               );
                             } catch (e) {
                               setState(() => isValidPin = false);

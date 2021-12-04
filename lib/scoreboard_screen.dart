@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,19 +14,21 @@ import 'package:smack_talking_scoreboard/utils/top_level_functions.dart';
 import 'models/winners.dart';
 
 class ScoreboardScreen extends StatelessWidget {
-  const ScoreboardScreen();
+  const ScoreboardScreen(this.pin);
+  final String pin;
   @override
   Widget build(BuildContext context) {
-    return Scoreboard(Cloudstore.of(context));
+    return Scoreboard(Cloudstore.of(context), pin);
   }
 }
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
 
-  const Scoreboard(this.cloudstore);
+  const Scoreboard(this.cloudstore, this.pin);
 
   final Cloudstore cloudstore;
+  final String pin;
 
   @override
   _ScoreboardState createState() => _ScoreboardState();
@@ -77,8 +78,6 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
   int playerOneWinCount = 0;
   int playerTwoWinCount = 0;
   bool playerTurnButtonEnabled = true;
-
-  CollectionReference singleGameCollection;
 
   @override
   initState() {
@@ -164,7 +163,10 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     }
 
     widget.cloudstore.updateCollectionData(
-        singleGameCollection, 'game_doc', {'insult': insultList.first});
+      context,
+      gamePin: widget.pin,
+      data: {'insult': insultList.first},
+    );
 
     setState(() {
       tts.speak(insultList.first);
@@ -178,6 +180,12 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
     player1TextEditingController.dispose();
     player2TextEditingController.dispose();
     ftwTextEditingController.dispose();
+
+    // TODO(me): fix this
+    // widget.cloudstore.deleteDocument(
+    //     widget.cloudstore
+    //         .collection('accounts/nickalasb@gmail.com/single_games'),
+    //     'game_doc');
     super.dispose();
   }
 
@@ -201,16 +209,20 @@ class _ScoreboardState extends State<Scoreboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    widget.cloudstore.updateCollectionData(singleGameCollection, 'game_doc', {
-      'player1Name': playerOneName,
-      'player1Score': playerOneScore,
-      'player1WinCount': playerOneWinCount,
-      'player2Name': playerTwoName,
-      'player2Score': playerTwoScore,
-      'player2WinCount': playerTwoWinCount,
-      'ftwScore': scoreToWin,
-      'numberOfRounds': roundsToWin,
-    });
+    widget.cloudstore.updateCollectionData(
+      context,
+      gamePin: widget.pin,
+      data: {
+        'player1Name': playerOneName,
+        'player1Score': playerOneScore,
+        'player1WinCount': playerOneWinCount,
+        'player2Name': playerTwoName,
+        'player2Score': playerTwoScore,
+        'player2WinCount': playerTwoWinCount,
+        'ftwScore': scoreToWin,
+        'numberOfRounds': roundsToWin,
+      },
+    );
 
     bool playerOneWins = false;
     bool playerTwoWins = false;

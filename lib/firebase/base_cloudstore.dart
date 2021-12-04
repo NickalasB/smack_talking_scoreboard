@@ -15,11 +15,14 @@ class Cloudstore {
   }
 
   Future<void> updateCollectionData(
-    CollectionReference collection,
-    String documentPath,
+    BuildContext context, {
+    String gamePin,
     Map<String, dynamic> data,
-  ) async {
-    await collection.document(documentPath).updateData(data);
+  }) async {
+    final user = await Auth.of(context).getCurrentUser();
+    await collection('accounts/${user.email}/single_games')
+        .document(gamePin)
+        .updateData(data);
   }
 
   Future<void> deleteSingleGame(BuildContext context, String pin) async {
