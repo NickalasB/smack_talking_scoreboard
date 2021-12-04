@@ -72,7 +72,7 @@ class _CreateOrJoinGameDialogState extends State<CreateOrJoinGameDialog>
         ),
         actions: <Widget>[
           FlatButton(
-            onPressed: () => Navigator.popAndPushNamed(context, widget.routeId),
+            onPressed: () => Navigator.of(context).pop(),
             child: Text(
               strings.offLine,
               style: TextStyle(fontSize: 20),

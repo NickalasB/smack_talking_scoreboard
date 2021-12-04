@@ -112,30 +112,37 @@ class _SettingsButtonState extends State<SettingsButton> {
   Widget build(BuildContext context) {
     final auth = Auth.of(context);
 
-    return PopupMenuButton<SignInState>(
-        icon: Icon(Icons.settings),
-        onSelected: (result) {
-          if (result == SignInState.signOut) {
-            auth.signOut().then((_) => setState(() {}));
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) => SignInDialog(),
-            ).then((_) => setState(() {}));
-          }
-        },
-        itemBuilder: (context) {
-          return <PopupMenuEntry<SignInState>>[
-            auth.getCurrentUser() != null
-                ? const PopupMenuItem<SignInState>(
-                    value: SignInState.signOut,
-                    child: Text(strings.signOut),
-                  )
-                : const PopupMenuItem<SignInState>(
-                    value: SignInState.signIn,
-                    child: Text(strings.signIn),
-                  ),
-          ];
+    //TODO(me): make this a future provider
+    return FutureBuilder<FirebaseUser>(
+        future: auth.getCurrentUser(),
+        builder: (context, snapshot) {
+          final isSignedIn = snapshot.hasData;
+
+          return PopupMenuButton<SignInState>(
+              icon: Icon(Icons.settings),
+              onSelected: (result) {
+                if (result == SignInState.signOut) {
+                  auth.signOut().then((_) => setState(() {}));
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => SignInDialog(),
+                  ).then((_) => setState(() {}));
+                }
+              },
+              itemBuilder: (context) {
+                return <PopupMenuEntry<SignInState>>[
+                  isSignedIn
+                      ? PopupMenuItem<SignInState>(
+                          value: SignInState.signOut,
+                          child: Text(strings.signOut),
+                        )
+                      : const PopupMenuItem<SignInState>(
+                          value: SignInState.signIn,
+                          child: Text(strings.signIn),
+                        ),
+                ];
+              });
         });
   }
 }
