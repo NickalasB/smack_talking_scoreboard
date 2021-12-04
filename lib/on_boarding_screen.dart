@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smack_talking_scoreboard/main_menu_screen.dart';
 import 'package:smack_talking_scoreboard/text_to_speech.dart';
@@ -47,7 +46,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final subtitleStyle = Theme.of(context).textTheme.subtitle;
+    final subtitleStyle = Theme.of(context).textTheme.subtitle2;
     return IntroductionScreen(
       globalBackgroundColor: Colors.grey[200],
       pages: listPagesViewModel(),
@@ -80,7 +79,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen>
 
   List<PageViewModel> listPagesViewModel() {
     final bodyTextStyle = TextStyle(fontSize: 18);
-    final emphasizedTextStyle = Theme.of(context).textTheme.headline;
+    final emphasizedTextStyle = Theme.of(context).textTheme.headline4;
     return [
       PageViewModel(
         titleWidget: (Text(
@@ -148,7 +147,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen>
         image: OnBoardingScreenButtons(),
         titleWidget: Text(
           strings.onBoardPage2Title,
-          style: Theme.of(context).textTheme.headline,
+          style: Theme.of(context).textTheme.headline4,
         ),
         bodyWidget: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +241,7 @@ class OnBoardingButtonColumn extends StatelessWidget {
       button,
       Text(
         text,
-        style: Theme.of(context).textTheme.subtitle,
+        style: Theme.of(context).textTheme.subtitle2,
       )
     ];
 
