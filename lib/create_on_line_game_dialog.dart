@@ -6,14 +6,34 @@ import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart';
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
-class CreateOnLineGameDialog extends StatefulWidget {
-  const CreateOnLineGameDialog();
+class OnLineGameDialog extends StatefulWidget {
+  const OnLineGameDialog._({this.onSubmit});
+
+  factory OnLineGameDialog.join(BuildContext context) {
+    return OnLineGameDialog._(
+      onSubmit: (pinValue) async {
+        // TODO(me): implement this
+      },
+    );
+  }
+
+  factory OnLineGameDialog.create(BuildContext context) {
+    return OnLineGameDialog._(
+      onSubmit: (pinValue) async =>
+          await Cloudstore.of(context).createSingleGameCollection(
+        context,
+        pin: pinValue,
+      ),
+    );
+  }
+
+  final Future<void> Function(String pinValue) onSubmit;
 
   @override
-  _CreateOnLineGameDialogState createState() => _CreateOnLineGameDialogState();
+  _OnLineGameDialogState createState() => _OnLineGameDialogState();
 }
 
-class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
+class _OnLineGameDialogState extends State<OnLineGameDialog>
     with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation animation;
@@ -90,10 +110,7 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
                               isLoading.value = true;
                             });
                             try {
-                              await cloudStore.createSingleGameCollection(
-                                context,
-                                pin: pinValue,
-                              );
+                              await widget.onSubmit(pinValue);
                               navigator.pop();
                               navigator.push(
                                 MaterialPageRoute(

@@ -58,7 +58,7 @@ class _CreateOrJoinGameDialogState extends State<CreateOrJoinGameDialog>
                 Navigator.of(context).pop();
                 await showDialog(
                   context: context,
-                  builder: (context) => CreateOnLineGameDialog(),
+                  builder: (context) => OnLineGameDialog.create(context),
                   barrierDismissible: false,
                 );
               },
