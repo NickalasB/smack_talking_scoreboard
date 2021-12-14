@@ -6,9 +6,7 @@ import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
 class CreateOrJoinGameDialog extends StatefulWidget {
-  const CreateOrJoinGameDialog(this.routeId);
-
-  final String routeId;
+  const CreateOrJoinGameDialog();
 
   @override
   _CreateOrJoinGameDialogState createState() => _CreateOrJoinGameDialogState();
@@ -60,7 +58,7 @@ class _CreateOrJoinGameDialogState extends State<CreateOrJoinGameDialog>
                 Navigator.of(context).pop();
                 await showDialog(
                   context: context,
-                  builder: (context) => CreateOnLineGameDialog(widget.routeId),
+                  builder: (context) => CreateOnLineGameDialog(),
                   barrierDismissible: false,
                 );
               },

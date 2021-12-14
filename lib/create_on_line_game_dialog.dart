@@ -7,9 +7,7 @@ import 'package:smack_talking_scoreboard/ui_components/dialog_action_button.dart
 import 'package:smack_talking_scoreboard/utils/strings.dart' as strings;
 
 class CreateOnLineGameDialog extends StatefulWidget {
-  const CreateOnLineGameDialog(this.routeId);
-
-  final String routeId;
+  const CreateOnLineGameDialog();
 
   @override
   _CreateOnLineGameDialogState createState() => _CreateOnLineGameDialogState();

@@ -169,7 +169,7 @@ class GameButton extends StatelessWidget {
                 context: context,
                 builder: (context) => SignInDialog(routeId: routeId),
               )
-            : showCreateOrJoinGameDialog(context, routeId),
+            : showCreateOrJoinGameDialog(context),
         elevation: 4,
         child: FittedBox(
           child: Text(
@@ -231,8 +231,7 @@ class _SignInDialogState extends State<SignInDialog> {
                       return signIn(
                               context, Auth.of(context).signInWithGoogle())
                           .then((_) => Navigator.of(context).pop())
-                          .then((_) => showCreateOrJoinGameDialog(
-                              context, widget.routeId))
+                          .then((_) => showCreateOrJoinGameDialog(context))
                           .then((_) {
                         setState(() => isLoadingNotifier.value = false);
                       });
@@ -311,8 +310,7 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
                     widget.isLoadingNotifier.value = true;
                     await _signUpWithEmailAndPassword()
                         .then((_) => Navigator.of(context).pop())
-                        .then((_) =>
-                            showCreateOrJoinGameDialog(context, widget.routeId))
+                        .then((_) => showCreateOrJoinGameDialog(context))
                         .then((_) => setState(
                             () => widget.isLoadingNotifier.value = false));
                   }
@@ -326,8 +324,7 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
                     widget.isLoadingNotifier.value = true;
                     await _signInWithEmailAndPassword()
                         .then((_) => Navigator.of(context).pop())
-                        .then((_) =>
-                            showCreateOrJoinGameDialog(context, widget.routeId))
+                        .then((_) => showCreateOrJoinGameDialog(context))
                         .then((_) => setState(
                             () => widget.isLoadingNotifier.value = false));
                   }
@@ -410,11 +407,10 @@ Future<void> signIn(
   }
 }
 
-Future<void> showCreateOrJoinGameDialog(
-    BuildContext context, String routeId) async {
+Future<void> showCreateOrJoinGameDialog(BuildContext context) async {
   showDialog(
     context: context,
-    builder: (context) => CreateOrJoinGameDialog(routeId),
+    builder: (context) => CreateOrJoinGameDialog(),
     barrierDismissible: false,
   );
 }
