@@ -20,23 +20,20 @@ class Cloudstore {
     Map<String, dynamic> data,
   }) async {
     final user = await Auth.of(context).getCurrentUser();
-    await collection('accounts/${user.email}/single_games')
+    await _singleGameCollectionReference(user.email)
         .document(gamePin)
         .updateData(data);
   }
 
   Future<void> deleteSingleGame(BuildContext context, String pin) async {
     final user = await Auth.of(context).getCurrentUser();
-    final singleGamesCollectionPath = 'accounts/${user.uid}/single_games';
-
-    await collection(singleGamesCollectionPath).document(pin).delete();
+    await _singleGameCollectionReference(user.email).document(pin).delete();
   }
 
-  Future<CollectionReference> singleGameCollectionReference(
-    BuildContext context,
-  ) async {
-    final user = await Auth.of(context).getCurrentUser();
-    return collection('accounts/${user.email}/single_games');
+  CollectionReference _singleGameCollectionReference(String userEmail) {
+    return collection('accounts')
+        .document(userEmail)
+        .collection('single_games');
   }
 
   Future<void> createSingleGameCollection(
@@ -44,18 +41,15 @@ class Cloudstore {
     String pin,
   }) async {
     final user = await Auth.of(context).getCurrentUser();
-    final gameCollectionReference =
-        await singleGameCollectionReference(context);
+    final gameCollectionReference = _singleGameCollectionReference(user.email);
 
     final allDocs = await gameCollectionReference.getDocuments();
     final gamePaths = allDocs.documents.map((d) => d.reference.path);
 
-    if (gamePaths.contains('$gameCollectionReference/$pin')) {
+    if (gamePaths.contains('${gameCollectionReference.document(pin).path}')) {
       throw Exception();
     } else {
-      await collection('accounts')
-          .document(user.email)
-          .collection('single_games')
+      await _singleGameCollectionReference(user.email)
           .document(pin)
           .setData(gameElements);
     }
