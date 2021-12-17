@@ -17,7 +17,7 @@ dependencies:
   flutter_tts: ^0.8.6
   introduction_screen: ^1.0.8
   google_sign_in: ^4.2.0
-  pinput: ^1.2.2
+  pinput: ^1.2.2 #nnbd
   provider: ^4.0.4
   shared_preferences: ^0.5.6+3
 
