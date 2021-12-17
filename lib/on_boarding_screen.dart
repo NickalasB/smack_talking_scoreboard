@@ -59,6 +59,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen>
         setHasSeenOnBoardingScreen(widget.prefs)
             .then((_) => navigateToMainMenu(context));
       },
+      showNextButton: false,
       skip: Text(
         strings.skip,
         style: subtitleStyle,

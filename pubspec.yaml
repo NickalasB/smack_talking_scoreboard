@@ -15,7 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_tts: ^0.8.6
-  introduction_screen: ^1.0.8
+  introduction_screen: ^2.1.0 #nnbd
   google_sign_in: ^4.2.0
   pinput: ^1.2.2 #nnbd
   provider: ^6.0.1 #nnbd
