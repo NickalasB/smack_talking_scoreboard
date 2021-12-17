@@ -65,7 +65,7 @@ class _CreateOnLineGameDialogState extends State<CreateOnLineGameDialog>
                     _pinPutDecoration(borderColor: Colors.blue),
                 submittedFieldDecoration:
                     _pinPutDecoration(borderColor: Colors.green),
-                autoValidate: true,
+                autovalidateMode: AutovalidateMode.always,
                 validator: (pin) {
                   return pin.length == 4 && !isValidPin
                       ? strings.pinValidationError
