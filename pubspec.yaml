@@ -19,7 +19,7 @@ dependencies:
   google_sign_in: ^4.2.0
   pinput: ^1.2.2 #nnbd
   provider: ^6.0.1 #nnbd
-  shared_preferences: ^0.5.6+3
+  shared_preferences: ^2.0.11 #nnbd
 
 dev_dependencies:
   flutter_test:
