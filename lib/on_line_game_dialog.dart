@@ -12,7 +12,12 @@ class OnLineGameDialog extends StatefulWidget {
   factory OnLineGameDialog.join(BuildContext context) {
     return OnLineGameDialog._(
       onSubmit: (pinValue) async {
-        // TODO(me): implement this
+        await Cloudstore.of(context).updateCollectionData(
+          context,
+          gamePin: pinValue,
+          userEmail: 'nickalasb@gmail.com',
+          data: {'player2Name': 'Poop Face'}, //TODO(me): create UI to set this
+        );
       },
     );
   }
@@ -61,7 +66,6 @@ class _OnLineGameDialogState extends State<OnLineGameDialog>
 
   @override
   Widget build(BuildContext context) {
-    final cloudStore = Cloudstore.of(context);
     final navigator = Navigator.of(context);
     return ScaleTransition(
       scale: animation,
