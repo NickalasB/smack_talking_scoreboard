@@ -113,7 +113,7 @@ class _SettingsButtonState extends State<SettingsButton> {
     final auth = Auth.of(context);
 
     //TODO(me): make this a future provider
-    return FutureBuilder<FirebaseUser>(
+    return FutureBuilder<User>(
         future: auth.getCurrentUser(),
         builder: (context, snapshot) {
           final isSignedIn = snapshot.hasData;
@@ -399,7 +399,7 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
 
 Future<void> signIn(
   BuildContext context,
-  Future<FirebaseUser> signInMethod,
+  Future<User> signInMethod,
 ) async {
   try {
     await signInMethod;

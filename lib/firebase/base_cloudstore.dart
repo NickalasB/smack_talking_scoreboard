@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'base_auth.dart';
 
 class Cloudstore {
-  final _fbCloudstore = Firestore.instance;
+  final _fbCloudstore = FirebaseFirestore.instance;
 
   static Cloudstore of(BuildContext context) =>
       Provider.of<Cloudstore>(context, listen: false);
@@ -31,7 +31,7 @@ class Cloudstore {
     String documentPath,
     Map<String, dynamic> data,
   }) async {
-    await collection.document(documentPath).setData(data);
+    await collection.doc(documentPath).set(data);
   }
 
   Future<void> updateCollectionData(
@@ -39,7 +39,7 @@ class Cloudstore {
     String documentPath,
     Map<String, dynamic> data,
   ) async {
-    await collection.document(documentPath).updateData(data);
+    await collection.doc(documentPath).update(data);
   }
 
   Future<void> post(
@@ -47,11 +47,9 @@ class Cloudstore {
     @required Map<String, dynamic> newData,
   }) async {
     _fbCloudstore.runTransaction((tx) async {
-      final allDocs = await collectionRef.getDocuments();
-      final toBeRetrieved =
-          allDocs.documents.sublist(allDocs.documents.length ~/ 2);
-      final toBeDeleted =
-          allDocs.documents.sublist(0, allDocs.documents.length ~/ 2);
+      final allDocs = await collectionRef.get();
+      final toBeRetrieved = allDocs.docs.sublist(allDocs.docs.length ~/ 2);
+      final toBeDeleted = allDocs.docs.sublist(0, allDocs.docs.length ~/ 2);
       await Future.forEach(toBeDeleted, (DocumentSnapshot snapshot) async {
         await tx.delete(snapshot.reference);
       });
@@ -67,7 +65,7 @@ class Cloudstore {
     String documentPath,
   ) async {
     _fbCloudstore.runTransaction((tx) async {
-      await tx.delete(collectionRef.document(documentPath));
+      await tx.delete(collectionRef.doc(documentPath));
     });
   }
 
@@ -75,7 +73,7 @@ class Cloudstore {
     final user = await Auth.of(context).getCurrentUser();
     final singleGamesCollectionPath = 'accounts/${user.uid}/single_games';
 
-    await collection(singleGamesCollectionPath).document(pin).delete();
+    await collection(singleGamesCollectionPath).doc(pin).delete();
   }
 
   Future<void> createSingleGameCollection(
@@ -85,18 +83,18 @@ class Cloudstore {
     final user = await Auth.of(context).getCurrentUser();
     final singleGamesCollectionPath = 'accounts/${user.email}/single_games';
     final singleGamesCollection = collection(singleGamesCollectionPath);
-    final allDocs = await singleGamesCollection.getDocuments();
+    final allDocs = await singleGamesCollection.get();
 
-    final gamePaths = allDocs.documents.map((d) => d.reference.path);
+    final gamePaths = allDocs.docs.map((d) => d.reference.path);
 
     if (gamePaths.contains('$singleGamesCollectionPath/$pin')) {
       throw Exception();
     } else {
       await collection('accounts')
-          .document(user.email)
+          .doc(user.email)
           .collection('single_games')
-          .document(pin)
-          .setData(gameElements);
+          .doc(pin)
+          .set(gameElements);
     }
   }
 }

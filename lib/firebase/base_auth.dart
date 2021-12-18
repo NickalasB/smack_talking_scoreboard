@@ -12,9 +12,9 @@ class Auth {
   static Auth of(BuildContext context) =>
       Provider.of<Auth>(context, listen: false);
 
-  Future<FirebaseUser> signInWithEmail(
+  Future<User> signInWithEmail(
       {@required String email, @required String password}) async {
-    AuthResult result;
+    UserCredential result;
 
     result = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
@@ -23,9 +23,9 @@ class Auth {
     return result.user;
   }
 
-  Future<FirebaseUser> signUpWithEmail(
+  Future<User> signUpWithEmail(
       {@required String email, @required String password}) async {
-    AuthResult result;
+    UserCredential result;
 
     result = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
@@ -34,25 +34,25 @@ class Auth {
     return result.user;
   }
 
-  Future<FirebaseUser> signInWithGoogle() async {
+  Future<User> signInWithGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
+    final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
-    FirebaseUser user;
+    User user;
     user = (await _firebaseAuth.signInWithCredential(credential)).user;
     print("Successfully signed in " + user.displayName);
 
     return user;
   }
 
-  Future<FirebaseUser> getCurrentUser() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+  Future<User> getCurrentUser() async {
+    User user = await _firebaseAuth.currentUser;
     return user;
   }
 
@@ -62,12 +62,12 @@ class Auth {
   }
 
   Future<void> sendEmailVerification() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    User user = await _firebaseAuth.currentUser;
     user.sendEmailVerification();
   }
 
   Future<bool> isEmailVerified() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.isEmailVerified;
+    User user = await _firebaseAuth.currentUser;
+    return user.emailVerified;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smack_talking_scoreboard/bracket_screen.dart';
@@ -7,10 +8,17 @@ import 'package:smack_talking_scoreboard/scoreboard_screen.dart';
 import 'package:smack_talking_scoreboard/text_to_speech.dart';
 import 'package:smack_talking_scoreboard/tournament_menu_screen.dart';
 
+import 'firebase_options.dart';
 import 'main_menu_screen.dart';
 import 'models/winners.dart';
 
-void main() => runApp(SmackTalkingScoreboard());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(SmackTalkingScoreboard());
+}
 
 class SmackTalkingScoreboard extends StatelessWidget {
   @override
